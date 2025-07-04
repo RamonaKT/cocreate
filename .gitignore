@@ -1,0 +1,7 @@
+dist/
+.json
+.env
+.idea
+.idea/
+node_modules/
+**/.env
