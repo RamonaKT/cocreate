@@ -6,6 +6,7 @@ import { io } from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 import { getCreations, saveCreation } from '../../../backend/supabase/database.js';
 import { jsPDF } from 'jspdf';
 import { svg2pdf } from 'svg2pdf.js';
+import { hashIp } from './hash';
 const params = new URLSearchParams(window.location.search);
 const mindmapId = params.get('id');
 let initialSyncDone = false;
