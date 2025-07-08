@@ -379,7 +379,6 @@ async function initializeAccessControl(shadowRoot) {
 }
 
 export function showNicknameModal(shadowRoot = document) {
-
   // Modal einfügen oder anzeigen
   let modal = shadowRoot.getElementById('nicknameModal');
   if (!modal) {
@@ -420,7 +419,7 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
               console.log(`🔓 Nutzer ${user.nickname} automatisch entsperrt.`);
             } else {
               console.warn(`🚫 Nutzer ${user.nickname} ist noch gesperrt.`);
-              showNicknameModal();
+              showNicknameModal(shadowRoot);
               return;
             }
           }
@@ -751,8 +750,17 @@ window.submitNickname = async function () {
 window.addEventListener('load', async () => {
   const mindmapId = new URLSearchParams(window.location.search).get('id');
   if (!mindmapId) return;
-  // Modal vorbereiten, aber noch nicht zeigen
-  createNicknameModal();
+
+  const host = document.querySelector('cocreate-mindmap');
+  if (!host || !host.shadowRoot) {
+    console.error("❌ ShadowRoot nicht gefunden!");
+    return;
+  }
+
+  const shadowRoot = host.shadowRoot;
+
+  createNicknameModal(shadowRoot);
+
   let ip = 'unknown';
   try {
     const res = await fetch('https://api.ipify.org?format=json');
@@ -760,7 +768,7 @@ window.addEventListener('load', async () => {
     ip = data.ip;
   } catch (err) {
     console.warn("IP konnte nicht ermittelt werden:", err);
-    showNicknameModal();
+    showNicknameModal(shadowRoot);
     return;
   }
   // Sofort Sperre prüfen
@@ -805,7 +813,7 @@ window.addEventListener('load', async () => {
   } catch (err) {
     console.error("Fehler bei Login über IP:", err);
   }
-  showNicknameModal();
+  showNicknameModal(ShadowRoot);
 });
 
 async function loadUsersForCurrentMindmap(shadowRoot = document) {
@@ -1207,64 +1215,6 @@ export function setupMindmap(shadowRoot) {
   console.log("✅ Mindmap im Shadow DOM vollständig initialisiert");
 }
 
-window.addEventListener('load', async () => {
-  const mindmapId = new URLSearchParams(window.location.search).get('id');
-  if (!mindmapId) return;
-  // Modal vorbereiten (erstellen)
-  createNicknameModal();
-  let ip = 'unknown';
-  try {
-    const res = await fetch('https://api.ipify.org?format=json');
-    const data = await res.json();
-    ip = data.ip;
-  } catch (err) {
-    console.warn("IP konnte nicht ermittelt werden:", err);
-    showNicknameModal();
-    return;
-  }
-  // Nickname aus localStorage?
-  const storedNickname = localStorage.getItem("mindmap_nickname");
-  if (storedNickname) {
-    try {
-      const { data: user, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('nickname', storedNickname)
-          .eq('ipadress', ip)
-          .maybeSingle();
-      if (!error && user && !user.locked && user.mindmap_id == mindmapId) {
-        userNickname = storedNickname;
-        console.log("Automatisch eingeloggt:", userNickname);
-        document.getElementById('nicknameModal')?.remove();
-        startIpLockWatcher(ip);
-        return;
-      }
-    } catch (e) {
-      console.error("Fehler bei Login mit gespeicherten Nickname:", e);
-    }
-  }
-  // Versuch per IP
-  try {
-    const { data: user, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('ipadress', ip)
-        .eq('mindmap_id', mindmapId)
-        .maybeSingle();
-    if (!error && user && !user.locked) {
-      userNickname = user.nickname;
-      localStorage.setItem("mindmap_nickname", userNickname);
-      console.log("Automatisch über IP eingeloggt:", userNickname);
-      document.getElementById('nicknameModal')?.remove();
-      startIpLockWatcher(ip);
-      return;
-    }
-  } catch (err) {
-    console.error("Fehler bei Login über IP:", err);
-  }
-  // Fallback → Nickname abfragen
-  showNicknameModal();
-});
 function exportMindmapAsSVG(svgElement) {
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svgElement);

@@ -1,7 +1,7 @@
 :host {
-    --color-level-1: #797ec6;
-    --color-level-2: #a4a9ea;
-    --color-level-3: #ced2ff;
+    --ccolor-level-1: #797ec6;
+    --ccolor-level-2: #a4a9ea;
+    --ccolor-level-3: #ced2ff;
     --cocreate-main-color: var(--secondary-main-color);
     --cocreate-highlight-color: yellow;
     --cocreate-admin-color: gold;
@@ -90,7 +90,6 @@ button {
 }
 
 
-
 /*Mindmap mit Arbeitsflächen*/
 
 #mindmap-container {
@@ -121,6 +120,7 @@ svg {
     cursor: grab;
     transition: stroke 0.2s ease;
     overflow: hidden;
+    background-color: var(--color-level-1);
 }
 
 
