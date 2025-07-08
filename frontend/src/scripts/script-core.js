@@ -157,7 +157,7 @@ export function createNicknameModal(shadowRoot = document) {
     shadowRoot.appendChild(modal);
     modal.querySelector('#nicknameSubmitButton')?.addEventListener('click', () => {
         submitNickname(shadowRoot);
-    });
+    });  
     modal.querySelector('#nicknameInput')?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -339,7 +339,7 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
 async function initializeAccessControl(shadowRoot) {
     const mindmapId = new URLSearchParams(window.location.search).get('id');
     if (!mindmapId) return;
-    createNicknameModal(); // Modal vorbereiten
+    createNicknameModal(shadowRoot); // Modal vorbereiten
     let ip = 'unknown';
     try {
         const res = await fetch('https://api.ipify.org?format=json');
@@ -613,8 +613,8 @@ export async function exportMindmapToPDF() {
 
 window.exportMindmapToPDF = exportMindmapToPDF;
 //start of ipaddress locking
-window.submitNickname = async function () {
-    const input = document.getElementById('nicknameInput').value.trim();
+window.submitNickname = async function (shadowRoot = document) {
+    const input = shadowRoot.getElementById('nicknameInput')?.value.trim();
     if (!input) {
         alert("Bitte Nickname eingeben.");
         return;
@@ -698,7 +698,7 @@ window.submitNickname = async function () {
         // Nutzer erfolgreich gespeichert
         userNickname = input;
         localStorage.setItem("mindmap_nickname", userNickname);
-        document.getElementById('nicknameModal')?.remove();
+        shadowRoot.getElementById('nicknameModal')?.remove();
         startIpLockWatcher(ip);
         console.log("Neuer Nutzer gespeichert & Zugriff erlaubt:", userNickname);
     } catch (err) {
