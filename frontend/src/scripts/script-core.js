@@ -323,7 +323,7 @@ async function initializeAccessControl(shadowRoot) {
         .from('users')
         .select('*')
         .eq('nickname', storedNickname)
-        .eq('ipadress', ip)
+        .eq('ipadress', await hashIp(ip))
         .maybeSingle();
       if (!error && user && !user.locked && user.mindmap_id === mindmapId) {
         userNickname = storedNickname;
@@ -340,7 +340,7 @@ async function initializeAccessControl(shadowRoot) {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('ipadress', ip)
+      .eq('ipadress', await hashIp(ip))
       .eq('mindmap_id', mindmapId)
       .maybeSingle();
     if (!error && user && !user.locked) {
@@ -376,7 +376,7 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
       const { data: users, error } = await supabase
         .from('users')
         .select('nickname, locked, locked_until')
-        .eq('ipadress', ip)
+        .eq('ipadress', await hashIp(ip))
         .eq('mindmap_id', mindmapId);
       if (error) {
         console.error("Fehler bei Lock-Check:", error.message);
@@ -641,7 +641,7 @@ window.submitNickname = async function () {
   const { data: existingLocks, error: lockError } = await supabase
     .from('users')
     .select('locked, locked_until')
-    .eq('ipadress', ip)
+    .eq('ipadress', await hashIp(ip))
     .eq('mindmap_id', mindmapId);
   if (lockError) {
     alert("Fehler beim Sperr-Check.");
@@ -691,7 +691,7 @@ window.submitNickname = async function () {
       .from('users')
       .insert([{
         nickname: input,
-        ipadress: ip,
+        ipadress: await hashIp(ip),
         locked: false,
         admin: isAdmin,
         mindmap_id: parseInt(mindmapId)
@@ -737,7 +737,7 @@ window.addEventListener('load', async () => {
         .from('users')
         .select('*')
         .eq('nickname', storedNickname)
-        .eq('ipadress', ip)
+        .eq('ipadress', await hashIp(ip))
         .maybeSingle();
       if (!error && user && !user.locked && user.mindmap_id == mindmapId) {
         userNickname = storedNickname;
@@ -755,7 +755,7 @@ window.addEventListener('load', async () => {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('ipadress', ip)
+      .eq('ipadress', await hashIp(ip))
       .eq('mindmap_id', mindmapId)
       .maybeSingle();
     if (!error && user && !user.locked) {
@@ -1175,7 +1175,7 @@ window.addEventListener('load', async () => {
         .from('users')
         .select('*')
         .eq('nickname', storedNickname)
-        .eq('ipadress', ip)
+        .eq('ipadress', await hashIp(ip))
         .maybeSingle();
       if (!error && user && !user.locked && user.mindmap_id == mindmapId) {
         userNickname = storedNickname;
@@ -1193,7 +1193,7 @@ window.addEventListener('load', async () => {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('ipadress', ip)
+      .eq('ipadress', await hashIp(ip))
       .eq('mindmap_id', mindmapId)
       .maybeSingle();
     if (!error && user && !user.locked) {
