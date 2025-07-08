@@ -5,22 +5,6 @@ import { jsPDF } from 'jspdf';
 import { svg2pdf } from 'svg2pdf.js';
 import { hashIp } from './hash';
 
-let initialSyncDone = false;
-let dragLine = null;
-let svg = null;
-let socket = null;
-let saveTimeout;
-let userNickname = null;
-let userToLock = null;
-let zoom = 1;
-let draggedType = null;
-let dragTarget = null;
-let offset = { x: 0, y: 0 };
-let allNodes = [];
-let allConnections = [];
-let selectedNode = null;
-let selectedConnection = null; 
-
 const zoomStep = 0.025;
 const minZoom = 0.1;
 const maxZoom = 3;
@@ -38,6 +22,21 @@ const nodeStyles = {
   3: { r: 40, color: getCSSColor(3), label: 'Ebene 3', fontSize: 12 },
 };
 
+let initialSyncDone = false;
+let dragLine = null;
+let svg = null;
+let socket = null;
+let saveTimeout;
+let userNickname = null;
+let userToLock = null;
+let zoom = 1;
+let draggedType = null;
+let dragTarget = null;
+let offset = { x: 0, y: 0 };
+let allNodes = [];
+let allConnections = [];
+let selectedNode = null;
+let selectedConnection = null; 
 let viewBox = {
   x: centerX - initialViewBoxSize / 2,
   y: centerY - initialViewBoxSize / 2,
