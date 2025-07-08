@@ -1047,7 +1047,7 @@ export function setupMindmap(shadowRoot) {
   // Delete-Taste zum Entfernen von Knoten oder Verbindung
   document.addEventListener('keydown', (e) => {
     const activeElement = document.activeElement;
-    const isInputFocused = (
+  /*  const isInputFocused = (
       activeElement &&
       (
         activeElement.tagName === "INPUT" ||
@@ -1055,7 +1055,14 @@ export function setupMindmap(shadowRoot) {
         activeElement.isContentEditable ||
         activeElement.closest("foreignObject") // ← Wichtig für deine SVG-Inputs!
       )
-    );
+    );*/
+  const path = e.composedPath();
+  const isTyping = path.some(el =>
+    el instanceof HTMLElement &&
+    (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+  );
+  if (isTyping) return;
+
     if (isInputFocused) {
       return;
     }
