@@ -20,12 +20,6 @@ let allNodes = [];
 let allConnections = [];
 let selectedNode = null;
 let selectedConnection = null; 
-let viewBox = {
-  x: centerX - initialViewBoxSize / 2,
-  y: centerY - initialViewBoxSize / 2,
-  w: initialViewBoxSize,
-  h: initialViewBoxSize,
-};
 
 const zoomStep = 0.025;
 const minZoom = 0.1;
@@ -44,6 +38,12 @@ const nodeStyles = {
   3: { r: 40, color: getCSSColor(3), label: 'Ebene 3', fontSize: 12 },
 };
 
+let viewBox = {
+  x: centerX - initialViewBoxSize / 2,
+  y: centerY - initialViewBoxSize / 2,
+  w: initialViewBoxSize,
+  h: initialViewBoxSize,
+};
 
 function scheduleSVGSave(delay = 1000) {
   clearTimeout(saveTimeout);
