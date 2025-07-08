@@ -121,8 +121,14 @@ function highlightNode(id, on) {
   if (on) shape.classList.add('highlighted');
   else shape.classList.remove('highlighted');
 }
-function createNicknameModal(shadowroot = document) {
-  if (document.getElementById('nicknameModal')) return;
+export function createNicknameModal(shadowRoot = document) {
+  if (!shadowRoot || shadowRoot === document) {
+  console.warn('❗ Achtung: createNicknameModal wurde ohne ShadowRoot aufgerufen!');
+  return;
+ }
+
+  if (shadowRoot.getElementById('nicknameModal')) return;
+
   const modal = document.createElement('div');
   modal.id = 'nicknameModal';
   modal.innerHTML = `
@@ -132,13 +138,17 @@ function createNicknameModal(shadowroot = document) {
       <button id="nicknameSubmitButton">Speichern</button>
     </div>
   `;
-  document.body.appendChild(modal);
-  document.getElementById('nicknameSubmitButton').addEventListener('click', submitNickname);
 
-  document.getElementById('nicknameInput').addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      submitNickname();
+  shadowRoot.appendChild(modal);
+
+  modal.querySelector('#nicknameSubmitButton')?.addEventListener('click', () => {
+    submitNickname(shadowRoot);
+  });
+
+  modal.querySelector('#nicknameInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitNickname(shadowRoot);
     }
   });
 }
@@ -367,17 +377,22 @@ async function initializeAccessControl(shadowRoot) {
   loadUsersForCurrentMindmap(shadowRoot);
   showNicknameModal();
 }
-function showNicknameModal(shadowRoot = document) {
+
+export function showNicknameModal(shadowRoot = document) {
+
+  // Modal einfügen oder anzeigen
   let modal = shadowRoot.getElementById('nicknameModal');
   if (!modal) {
-    createNicknameModal();
+    createNicknameModal(shadowRoot);
     modal = shadowRoot.getElementById('nicknameModal');
   }
+
   if (modal) {
-    modal.style.display = 'flex';
+    modal.style.display = 'flex'; // wichtig, falls CSS initial auf display:none steht
   } else {
     console.error("⚠️ Konnte Modal nicht anzeigen – fehlt.");
   }
+
   sessionStorage.removeItem("mindmap_nickname");
   localStorage.removeItem("mindmap_nickname");
 }
