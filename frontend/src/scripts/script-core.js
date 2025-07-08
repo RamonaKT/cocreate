@@ -244,7 +244,7 @@ function addEventListenersToNode(group, id, r) {
 function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
     //type = String(type);
     const style = nodeStyles[type];
-    //if (!style) return;
+
     if (!style) {
         console.warn("Unbekannter Typ:", type);
         return;
@@ -285,7 +285,6 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
         shape.setAttribute("height", style.r * 1.2);
         shape.setAttribute("rx", 0);
         shape.setAttribute("ry", 0);
-        // shape.style.pointerEvents = "none";
 
     }
     shape.setAttribute("fill", style.color);
@@ -1067,16 +1066,6 @@ export function setupMindmap(shadowRoot) {
     });
     // Delete-Taste zum Entfernen von Knoten oder Verbindung
     document.addEventListener('keydown', (e) => {
-        const activeElement = document.activeElement;
-        /*  const isInputFocused = (
-            activeElement &&
-            (
-              activeElement.tagName === "INPUT" ||
-              activeElement.tagName === "TEXTAREA" ||
-              activeElement.isContentEditable ||
-              activeElement.closest("foreignObject") // ← Wichtig für deine SVG-Inputs!
-            )
-          );*/
         const path = e.composedPath();
         const isTyping = path.some(el =>
             el instanceof HTMLElement &&
