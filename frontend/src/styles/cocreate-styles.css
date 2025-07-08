@@ -33,60 +33,63 @@ button {
 }
 
 #sidebar-left {
-    margin-right: var(--cocreate-margin);
-    max-width: 4.6875rem;;
-    background-color:transparent;
+    margin-right: 10px;
+    max-width: 75px;
+    background-color: transparent;
     position: absolute;
     left: 1vw;
-    top: 8vh;
+    top: 10vh;
     width: 25vh;
-    padding: var(--cocreate-padding);
+    padding: 10px;
     text-align: left;
     overflow-y: auto;
-    font-size: var(--cocreate-font-size-small);
+    font-size: 14px;
+    font-family: sans-serif;
 }
 
 .sidebar img {
-    height: 4.6875rem;;
-    width: 4.6875rem;;
+    height: 75px;
+    width: 75px;
     border-radius: 15%;
 }
 
-/*Die Toolbar mit den Items zum ziehen*/ 
+/*Die Toolbar mit den Items zum ziehen*/
 #toolbar {
     position: fixed;
     display: flex;
     justify-content: center;
     gap: 10%;
-    padding: var(--cocreate-padding);
+    padding: 10px;
     background: transparent;
     height: 6vh;
+    /*border-top: 1px solid black;
+    border-bottom: 1px solid black;*/
     right: 1vw;
-    top:8vh;
+    top:10vh;
 }
 
 .node-template {
     width: 17vh;
     height: 5vh;
-    border-radius: var(--cocreate-radius-large);
-    border: 0.125rem solid black;
+    border-radius: 15px;
+    border: 2px solid black;
     color: black;
-    line-height: 2.5rem;
+    line-height: 40px;
     cursor: grab;
     user-select: none;
     font-size: 1.5vh;
-    font-size: var(--cocreate-font-size-large);
+    font-size: 20px;
     text-align: center;
-
-  &[data-type="1"] {
-      background: var(--color-level-1);
-  }
-  &[data-type="2"] {
-      background: var(--color-level-2);
-  }
-  &[data-type="3"] {
-      background: var(--color-level-3);
 }
+
+.node-template[data-type="1"] {
+    background: var(--color-level-1);
+}
+.node-template[data-type="2"] {
+    background: var(--color-level-2);
+}
+.node-template[data-type="3"] {
+    background: var(--color-level-3);
 }
 
 
@@ -95,7 +98,7 @@ button {
 #mindmap-container {
     display: flex;
     justify-content: center;
-    margin: var(--cocreate-margin);
+    margin: 10px;
     height: 85vh;
 }
 
@@ -103,12 +106,12 @@ button {
 #mindmap{
     height: 100%;
     width: 100%;
-    margin-top: var(--cocreate-margin);
-    border: 0.125rem solid black;
+    margin-top: 3vh;
+    border: 2px solid black;
 }
 
 svg {
-    border: 0.0625rem solid #ccc;
+    border: 1px solid #ccc;
     background: white;
     overflow: scroll;
     object-view-box: 50 50;
@@ -131,11 +134,15 @@ svg {
 
 
 .draggable ellipse.highlighted,
-.draggable rect.highlighted,
+.draggable rect.highlighted {
+    stroke: yellow;
+    stroke-width: 3;
+}
+
 .connection-line.highlighted {
-    stroke: var(--cocreate-highlight-color);
+    stroke: yellow ;
     stroke-width: 3; /* größer für Hervorhebung */
-    filter: drop-shadow(0 0 5px var(--cocreate-highlight-color));
+    filter: drop-shadow(0 0 5px yellow);
 }
 
 
@@ -147,19 +154,24 @@ foreignObject input {
     margin: 0;
     background: white;
     color: black;
-    font-size: 0.75rem;
+    font-size: 12px;
     text-align: center;
     font-family: sans-serif;
     outline: none;
-    border-radius: var(--cocreate-radius-large);
+    border-radius: 20px;
+}
+
+
+#iplockOverlay {
+    display: none;
 }
 
 .badge.admin {
-  background-color: var(--cocreate-admin-color);
+  background-color: gold;
   color: black;
-  padding: 0.125rem 0.375rem;
-  margin-left: var(--cocreate-margin);
-  border-radius: var(--cocreate-radius-small);
+  padding: 2px 6px;
+  margin-left: 10px;
+  border-radius: 4px;
   font-weight: bold;
   font-size: 0.8em;
 }
@@ -173,25 +185,25 @@ foreignObject input {
   align-items: center;
   justify-content: center;
   z-index: 9999;
+}
 
- .overlay-box {
-    background: white;
-    padding: var(--cocreate-padding);
-    border-radius: var(--cocreate-radius-large);
-    min-width: 18.75rem;
-    text-align: center;
-  }
+#ipLockOverlay .overlay-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+  text-align: center;
+}
 
-  .overlay-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: var(--cocreate-margin);
-    gap: var(--cocreate-margin);
-  }
+#ipLockOverlay .overlay-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 10px;
+}
 
-  button {
-    padding: 0.5rem 1rem;
-  }
+#ipLockOverlay button {
+  padding: 8px 16px;
 }
 
 /* Modal-Overlay */
@@ -203,27 +215,28 @@ foreignObject input {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 9999;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
+}
 
-  .modal-content {
+/* Modal-Inhalt */
+#nicknameModal .modal-content {
   background: white;
-  padding: var(--cocreate-padding);
-  border-radius: var(--cocreate-radius-large);
-  width: 18.75rem;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
   text-align: center;
-  }
+}
 
-  input {
+#nicknameModal input {
   width: 90%;
-  padding: 0.5rem;
+  padding: 8px;
   text-align: center;         /* Text im Feld linksbündig */
   margin: 0 auto;           /* zentriert das Feld horizontal */
   display: block;
-  }
+}
 
-  button {
-  margin-top: var(--cocreate-margin);
-  }
+#nicknameModal button {
+  margin-top: 10px;
 }
