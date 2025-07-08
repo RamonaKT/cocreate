@@ -1,22 +1,27 @@
 import { setupMindmap } from './script-core.js';
+import iconOverview from '../assets/icons/icon-overview.png';
+import iconDownload from '../assets/icons/icon-download.png';
+import iconSave from '../assets/icons/icon-save.png';
+import iconManual from '../assets/icons/icon-manual.png';
+
 export class CoCreateMindmap extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-    }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
 
-    async connectedCallback() {
+  async connectedCallback() {
 
-        const cocreateCss = new URL('../styles/cocreate-styles.css', import.meta.url);
+    const cocreateCss = new URL('../styles/cocreate-styles.css', import.meta.url);
 
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = cocreateCss;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = cocreateCss;
 
-        this.shadowRoot.append(link);
+    this.shadowRoot.append(link);
 
-        const container = document.createElement('div');
-        container.innerHTML = `
+    const container = document.createElement('div');
+    container.innerHTML = `
       <div id="toolbar">
         <div class="node-template" draggable="true" data-type="1">Ebene 1</div>
         <div class="node-template" draggable="true" data-type="2">Ebene 2</div>
@@ -25,7 +30,7 @@ export class CoCreateMindmap extends HTMLElement {
 
       <div id="mindmap-container">
         <div id="sidebar-left" class="sidebar">
-          <img src="../frontend/src/assets/icons/icon-manual.png" alt="Icon manual"
+          <img src="${iconManual}" alt="Icon manual"
             style="cursor: pointer;" draggable="false" 
             onclick="this.getRootNode().getElementById('dialogIconManual').showModal()">
 
@@ -36,7 +41,7 @@ export class CoCreateMindmap extends HTMLElement {
               onclick="this.closest('dialog').close()">Schließen</button>
           </dialog>
 
-          <img src="../frontend/src/assets/icons/icon-overview.png" alt="Icon overview user"
+         <img src="${iconOverview}" alt="Icon overview user"
             style="cursor: pointer;" draggable="false" 
             onclick="this.getRootNode().getElementById('dialogIconOverviewUser').showModal(); window.loadUsersForCurrentMindmap(this.getRootNode());">
 
@@ -47,10 +52,10 @@ export class CoCreateMindmap extends HTMLElement {
               onclick="this.closest('dialog').close()">Schließen</button>
           </dialog>
 
-          <img src="../frontend/src/assets/icons/icon-download.png" alt="Icon Download pdf"
+          <img src="${iconDownload}" alt="Icon Download pdf"
             class="pdfButton" id="downloadbtn" style="cursor: pointer;" draggable="false">
 
-          <img src="../frontend/src/assets/icons/icon-save.png" alt="Icon save" id="saveButton"
+          <img src="${iconSave}" alt="Icon save" id="saveButton"
             style="cursor: pointer;" draggable="false">
         </div>
 
@@ -68,10 +73,10 @@ export class CoCreateMindmap extends HTMLElement {
       </div>
     `;
 
-        this.shadowRoot.appendChild(container);
-        setupMindmap(this.shadowRoot);
+    this.shadowRoot.appendChild(container);
+    setupMindmap(this.shadowRoot);
 
-    }
+  }
 }
 
 customElements.define('cocreate-mindmap', CoCreateMindmap);
