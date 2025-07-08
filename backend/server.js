@@ -103,8 +103,10 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
     console.log(`🚀 Socket.IO Server läuft auf http://localhost:${PORT}`);
-});
+  });
+}
 
 export { server, io, maps }; // zum Testen
