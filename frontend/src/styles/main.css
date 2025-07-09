@@ -1,86 +1,100 @@
 
 :root {
+  /* Basis-Farben für verschiedene Interface-Elemente */
   --secondary-main-color: #797ec6;
   --color-level-1: #797ec6;
-  --color-level-2: #a4a9ea;
-  --color-level-3: #ced2ff;
+  --color-level-2: #a4a9ea; 
+  --color-level-3: #ced2ff; 
 }
 
-
+/* ===========================
+   NODE-VORLAGEN (drag-drop) // falls es hier gezogen wird und nicht im anderen style
+   =========================== */
+/* Wird z. T. aus dieser Vorlage per Drag & Drop in die Arbeitsfläche gezogen */
 .node-template {
-    width: 17vh;
-    height: 5vh;
-    border-radius: var(--cocreate-radius-large);
-    border: 0.125rem solid black;
-    color: black;
-    line-height: 2.5rem;
-    cursor: grab;
-    user-select: none;
-    font-size: 1.5vh;
-    font-size: var(--cocreate-font-size-large);
-    text-align: center;
+  width: 17vh;
+  height: 5vh;
+  border-radius: var(--cocreate-radius-large); /* nutzt zentrale Variable */
+  border: 0.125rem solid black;
+  color: black;
+  line-height: 2.5rem;
+  cursor: grab; /* zeigt, dass Element ziehbar ist */
+  user-select: none; /* verhindert Textauswahl */
+  text-align: center;
+  font-size: var(--cocreate-font-size-large);
 
-  &[data-type="1"] {
-      background: var(--color-level-1);
-  }
-  &[data-type="2"] {
-      background: var(--color-level-2);
-  }
-  &[data-type="3"] {
-      background: var(--color-level-3);
-}
+  /* Farbvarianten abhängig vom Datentyp */
+  &[data-type="1"] { background: var(--color-level-1); }
+  &[data-type="2"] { background: var(--color-level-2); }
+  &[data-type="3"] { background: var(--color-level-3); }
 }
 
+/* ===========================
+   GRUNDLAGEN FÜR DAS DOKUMENT
+   =========================== */
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
-    text-align: center;
-    background: linear-gradient(to right, #9e78e9, #9eedf0);
-    font-size: 16px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f0f0; /* Fallback-Hintergrund */
+  text-align: center;
+  background: linear-gradient(to right, #9e78e9, #9eedf0); /* weicher Verlauf */
+  font-size: 16px; /* Basis-Schriftgröße für rem-Einheiten */
 }
 
+/* ===========================
+   HEADER / NAVIGATIONSBEREICH
+   =========================== */
 .header {
-    display: flex;
-    align-items: center;
-    column-gap: 1rem;
-    height: 5vh;
-    overflow: hidden;
-    /*background: linear-gradient(to right, #9e78e9, #9eedf0);*/
-    background-color: white;
+  display: flex;
+  align-items: center;
+  column-gap: 1rem; /* Abstand zwischen Elementen */
+  height: 5vh;
+  overflow: hidden;
+  background-color: white; /* Standard-Hintergrund */
 }
+
 .logo {
-    height: 100%;
-    width: auto;
+  height: 100%;
+  width: auto; /* Logo passt sich proportional an */
 }
 
-/*Überschrift erstmal unsichbar weil unsicher was styling angeht*/
+/* ===========================
+   HAUPTÜBERSCHRIFT
+   =========================== */
 h1 {
-    font-size: 4vh;
-    color: black;
-    text-align: center;
-    font-weight: normal;
-    font-family: sans-serif;
-    margin-left: 30vw;
-} 
+  font-size: 4vh;
+  color: black;
+  text-align: center;
+  font-weight: normal;
+  font-family: sans-serif;
+  margin-left: 30vw; 
+}
 
+/* ===========================
+   MODAL DIALOGFENSTER
+   =========================== */
 dialog {
-    background-color: #caeff0;
-    position: fixed;
-    margin: 0;
-    top:10vh;
-    left:1vw;
+  background-color: #caeff0; /* weiches Türkis */
+  position: fixed;
+  margin: 0;
+  top: 10vh;
+  left: 1vw;
 }
 
+/* ===========================
+   ZWISCHENÜBERSCHRIFT
+   =========================== */
 h2 {
-    margin-top: 0;
-    border-top: 0;
-    padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
 }
 
+/* ===========================
+   STANDARD-BUTTONS
+   =========================== */
 button {
-    border-radius: 20px;
-    margin-top: 10px;
-    background-color: #797ec6;
+  border-radius: 20px;
+  margin-top: 10px;
+  background-color: #797ec6; /* Hauptfarbe (statt Variable) */
 }
-
