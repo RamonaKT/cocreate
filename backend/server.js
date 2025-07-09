@@ -15,36 +15,28 @@ const io = new Server(server, {
     }
 });
 
-// Datenstruktur: mapId -> { nodes, users, connections }
 const maps = new Map();
 
 io.on('connection', (socket) => {
     console.log('🟢 Neue Verbindung:', socket.id);
 
-    socket.on('join-map', ({ mapId, userId }) => {
+    socket.on('join-map', ({ mapId }) => {
         socket.join(mapId);
         socket.data.mapId = mapId;
-        socket.data.userId = userId;
 
         if (!maps.has(mapId)) {
             maps.set(mapId, {
                 nodes: [],
-                connections: [],
-                users: {},
+                connections: []
             });
         }
 
         const map = maps.get(mapId);
-        map.users[userId] = socket.id;
-
         socket.emit('initial-sync', {
-            nodes: map.nodes,
-            users: Object.keys(map.users),
+            nodes: map.nodes
         });
 
-        socket.to(mapId).emit('user-joined', { userId, isAdmin: false });
     });
-
     socket.on('node-added', (data) => {
         const map = maps.get(socket.data.mapId);
         map.nodes.push(data);
