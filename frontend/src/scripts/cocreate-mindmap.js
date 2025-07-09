@@ -23,9 +23,9 @@ export class CoCreateMindmap extends HTMLElement {
     const container = document.createElement('div');
     container.innerHTML = `
       <div id="toolbar">
-        <div class="node-template" draggable="true" data-type="1">Ebene 1</div>
-        <div class="node-template" draggable="true" data-type="2">Ebene 2</div>
-        <div class="node-template" draggable="true" data-type="3">Ebene 3</div>
+        <div class="node-template" draggable="true" data-type="1">Bubble</div>
+        <div class="node-template" draggable="true" data-type="2">Label</div>
+        <div class="node-template" draggable="true" data-type="3">Note</div>
       </div>
 
       <div id="mindmap-container">
