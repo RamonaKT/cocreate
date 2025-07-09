@@ -376,34 +376,6 @@ export function highlightNode(id, on) {
     else shape.classList.remove('highlighted');
 }
 
-// Creates and displays a modal asking the user to enter a nickname.
-export function createNicknameModal(shadowRoot = document) {
-    if (!shadowRoot || shadowRoot === document) {
-        console.warn('Attention: createNicknameModal was called without ShadowRoot!');
-        return;
-    }
-    if (shadowRoot.getElementById('nicknameModal')) return;
-    const modal = document.createElement('div');
-    modal.id = 'nicknameModal';
-    modal.innerHTML = `
-    <div class="modal-content">
-      <h2>Choose nickname</h2>
-      <input id="nicknameInput" type="text" placeholder="Your Nickname" />
-      <button id="nicknameSubmitButton">Save</button>
-    </div>
-  `;
-    shadowRoot.appendChild(modal);
-    modal.querySelector('#nicknameSubmitButton')?.addEventListener('click', () => {
-        submitNickname(shadowRoot);
-    });
-    modal.querySelector('#nicknameInput')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            submitNickname(shadowRoot);
-        }
-    });
-}
-
 // Adds pointer, click, and rename events to an SVG node group.
 function addEventListenersToNode(group, id, r) {
     const node = allNodes.find(n => n.id === id);
@@ -575,6 +547,34 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
 
 }
 
+// Creates and displays a modal asking the user to enter a nickname.
+export function createNicknameModal(shadowRoot = document) {
+    if (!shadowRoot || shadowRoot === document) {
+        console.warn('Attention: createNicknameModal was called without ShadowRoot!');
+        return;
+    }
+    if (shadowRoot.getElementById('nicknameModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'nicknameModal';
+    modal.innerHTML = `
+    <div class="modal-content">
+      <h2>Choose nickname</h2>
+      <input id="nicknameInput" type="text" placeholder="Your Nickname" />
+      <button id="nicknameSubmitButton">Save</button>
+    </div>
+  `;
+    shadowRoot.appendChild(modal);
+    modal.querySelector('#nicknameSubmitButton')?.addEventListener('click', () => {
+        submitNickname(shadowRoot);
+    });
+    modal.querySelector('#nicknameInput')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitNickname(shadowRoot);
+        }
+    });
+}
+
 // Handles user access to the mindmap based on their IP and nickname, including admin detection.
 async function initializeAccessControl(shadowRoot) {
     const mindmapId = new URLSearchParams(window.location.search).get('id');
@@ -686,140 +686,6 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
         setTimeout(checkLock, 5000); // periodical check up
     }
     checkLock();
-}
-
-// SOCKET IO: -------
-if (mindmapId) {
-
-    initSocket(mindmapId, {
-        onInitialSync: ({ nodes }) => {
-            nodes.forEach(data => {
-                const node = allNodes.find(n => n.id === data.id);
-                if (node) {
-                    node.x = data.x;
-                    node.y = data.y;
-                    node.group.setAttribute("transform", `translate(${data.x},${data.y})`);
-                }
-            });
-        },
-        onNodeMoving: data => {
-            const node = allNodes.find(n => n.id === data.id);
-            if (node) {
-                node.x = data.x;
-                node.y = data.y;
-                node.group.setAttribute("transform", `translate(${data.x}, ${data.y})`);
-                updateConnections(data.id);
-            }
-        },
-        onNodeMoved: data => {
-            const node = allNodes.find(n => n.id === data.id);
-            if (node) {
-                node.x = data.x;
-                node.y = data.y;
-                node.group.setAttribute("transform", `translate(${data.x},${data.y})`);
-                updateConnections(data.id);
-            }
-        },
-        onNodeAdded: data => {
-            if (!allNodes.find(n => n.id === data.id)) {
-                createDraggableNode(data.x, data.y, data.type, data.id, true);
-            }
-        },
-        onNodeDeleted: ({ id }) => {
-            const nodeIndex = allNodes.findIndex(n => n.id === id);
-            if (nodeIndex === -1) return;
-            const node = allNodes[nodeIndex];
-            if (svg.contains(node.group)) svg.removeChild(node.group);
-            allNodes.splice(nodeIndex, 1);
-            allConnections = allConnections.filter(conn => {
-                if (conn.fromId === id || conn.toId === id) {
-                    if (svg.contains(conn.line)) svg.removeChild(conn.line);
-                    return false;
-                }
-                return true;
-            });
-        },
-        onConnectionAdded: ({ fromId, toId }) => {
-            if (!allConnections.some(conn => conn.fromId === fromId && conn.toId === toId)) {
-                connectNodes(fromId, toId);
-            }
-        },
-        onConnectionDeleted: ({ fromId, toId }) => {
-            const connIndex = allConnections.findIndex(
-                conn => conn.fromId === fromId && conn.toId === toId
-            );
-            if (connIndex !== -1) {
-                const conn = allConnections[connIndex];
-                svg.removeChild(conn.line);
-                allConnections.splice(connIndex, 1);
-            }
-        },
-        onNodeRenamed: ({ id, text }) => {
-            const node = allNodes.find(n => n.id === id);
-            if (node) {
-                const textEl = node.group.querySelector("text");
-                if (textEl) textEl.textContent = text;
-            }
-        },
-    });
-}
-
-// Generates a unique UUID using crypto.randomUUID() or a fallback pattern.
-function createUUID() {
-    if (window.crypto?.randomUUID) {
-        return window.crypto.randomUUID();
-    }
-    // Fallback: simple and secure alternative UUID
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-// saving mindmaps
-function getSVGSource() {
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(svg);
-}
-
-// Prompts the user for a title and saves the current mindmap SVG to Supabase.
-export async function saveCurrentMindmap() {
-    const title = prompt("Enter title:");
-    if (!title) return;
-    const svgData = getSVGSource();
-    const ip = await fetch('https://api.ipify.org').then(res => res.text());
-    try {
-        const result = await saveCreation(svgData, title, ip);
-        // Take the ID of the saved row from Supabase
-        const id = result[0]?.creationid;
-        if (id) {
-            alert("Successfully saved! You will be redirected...");
-            const link = `${location.origin}/?id=${id}`;
-            window.location.href = link;
-            console.log(link);
-        } else {
-            alert("Saved, but no ID returned.");
-        }
-    } catch (error) {
-        console.error("Error at Saving:", error);
-        alert("Error at Saving!");
-    }
-}
-
-// Drag from Toolbar
-document.querySelectorAll('.node-template').forEach(el => {
-    el.addEventListener('dragstart', e => {
-        draggedType = e.target.getAttribute('data-type');
-    });
-});
-
-// Converts screen (client) coordinates to SVG coordinates.
-function getSVGPoint(x, y) {
-    const pt = svg.createSVGPoint();
-    pt.x = x;
-    pt.y = y;
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
 // Exports the mindmap as a PDF file using jsPDF and svg2pdf.js.
@@ -1068,6 +934,140 @@ async function lockUserByNickname(nickname) {
 
 window.loadUsersForCurrentMindmap = loadUsersForCurrentMindmap;
 
+// SOCKET IO: -------
+if (mindmapId) {
+
+    initSocket(mindmapId, {
+        onInitialSync: ({ nodes }) => {
+            nodes.forEach(data => {
+                const node = allNodes.find(n => n.id === data.id);
+                if (node) {
+                    node.x = data.x;
+                    node.y = data.y;
+                    node.group.setAttribute("transform", `translate(${data.x},${data.y})`);
+                }
+            });
+        },
+        onNodeMoving: data => {
+            const node = allNodes.find(n => n.id === data.id);
+            if (node) {
+                node.x = data.x;
+                node.y = data.y;
+                node.group.setAttribute("transform", `translate(${data.x}, ${data.y})`);
+                updateConnections(data.id);
+            }
+        },
+        onNodeMoved: data => {
+            const node = allNodes.find(n => n.id === data.id);
+            if (node) {
+                node.x = data.x;
+                node.y = data.y;
+                node.group.setAttribute("transform", `translate(${data.x},${data.y})`);
+                updateConnections(data.id);
+            }
+        },
+        onNodeAdded: data => {
+            if (!allNodes.find(n => n.id === data.id)) {
+                createDraggableNode(data.x, data.y, data.type, data.id, true);
+            }
+        },
+        onNodeDeleted: ({ id }) => {
+            const nodeIndex = allNodes.findIndex(n => n.id === id);
+            if (nodeIndex === -1) return;
+            const node = allNodes[nodeIndex];
+            if (svg.contains(node.group)) svg.removeChild(node.group);
+            allNodes.splice(nodeIndex, 1);
+            allConnections = allConnections.filter(conn => {
+                if (conn.fromId === id || conn.toId === id) {
+                    if (svg.contains(conn.line)) svg.removeChild(conn.line);
+                    return false;
+                }
+                return true;
+            });
+        },
+        onConnectionAdded: ({ fromId, toId }) => {
+            if (!allConnections.some(conn => conn.fromId === fromId && conn.toId === toId)) {
+                connectNodes(fromId, toId);
+            }
+        },
+        onConnectionDeleted: ({ fromId, toId }) => {
+            const connIndex = allConnections.findIndex(
+                conn => conn.fromId === fromId && conn.toId === toId
+            );
+            if (connIndex !== -1) {
+                const conn = allConnections[connIndex];
+                svg.removeChild(conn.line);
+                allConnections.splice(connIndex, 1);
+            }
+        },
+        onNodeRenamed: ({ id, text }) => {
+            const node = allNodes.find(n => n.id === id);
+            if (node) {
+                const textEl = node.group.querySelector("text");
+                if (textEl) textEl.textContent = text;
+            }
+        },
+    });
+}
+
+// Generates a unique UUID using crypto.randomUUID() or a fallback pattern.
+function createUUID() {
+    if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+    }
+    // Fallback: simple and secure alternative UUID
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+// saving mindmaps
+function getSVGSource() {
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svg);
+}
+
+// Prompts the user for a title and saves the current mindmap SVG to Supabase.
+export async function saveCurrentMindmap() {
+    const title = prompt("Enter title:");
+    if (!title) return;
+    const svgData = getSVGSource();
+    const ip = await fetch('https://api.ipify.org').then(res => res.text());
+    try {
+        const result = await saveCreation(svgData, title, ip);
+        // Take the ID of the saved row from Supabase
+        const id = result[0]?.creationid;
+        if (id) {
+            alert("Successfully saved! You will be redirected...");
+            const link = `${location.origin}/?id=${id}`;
+            window.location.href = link;
+            console.log(link);
+        } else {
+            alert("Saved, but no ID returned.");
+        }
+    } catch (error) {
+        console.error("Error at Saving:", error);
+        alert("Error at Saving!");
+    }
+}
+
+// Drag from Toolbar
+document.querySelectorAll('.node-template').forEach(el => {
+    el.addEventListener('dragstart', e => {
+        draggedType = e.target.getAttribute('data-type');
+    });
+});
+
+// Converts screen (client) coordinates to SVG coordinates.
+function getSVGPoint(x, y) {
+    const pt = svg.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
 // Loads an existing mindmap from Supabase, restores its SVG, and re-initializes nodes and connections.
 async function loadMindmapFromDB(id) {
     const { data, error } = await supabase
@@ -1139,21 +1139,4 @@ async function loadMindmapFromDB(id) {
     if (titleEl && data.title) {
         titleEl.textContent = data.title;
     }
-}
-
-// Exports the current mindmap SVG as a downloadable .svg file.
-// Converts the SVG element into a Blob, generates a temporary URL,
-// and triggers a download by simulating a click on an anchor element.
-function exportMindmapAsSVG(svgElement) {
-    const serializer = new XMLSerializer();
-    const source = serializer.serializeToString(svgElement);
-    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "mindmap.svg";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }
