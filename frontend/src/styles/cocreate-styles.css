@@ -217,6 +217,14 @@ foreignObject input {
 /* ===========================
    MODALE OVERLAYS
    =========================== */
+#ipLockOverlay {
+  display: none;
+}
+
+#nicknameModal {
+  display: flex;
+}
+
 #ipLockOverlay,
 #nicknameModal {
   position: fixed;
@@ -226,7 +234,6 @@ foreignObject input {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* halbtransparentes Schwarz */
   z-index: 9999;
-  display: flex;
   align-items: center;
   justify-content: center;
 
