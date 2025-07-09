@@ -51,7 +51,12 @@ export class CoCreateMindmap extends HTMLElement {
 
     <dialog id="dialogIconManual">
       <h2>Quick-Start manual</h2>
-      <p>save to open new mindmap. everyone needs access to server. share id. have fun.</p>
+      <ul>
+        <li>Save to create a new mindmap.</li>
+        <li>Make sure everyone has access to the server.</li>
+        <li>Share the map ID to collaborate.</li>
+        <li>Most importantly, have fun working together!</li>
+      </ul>
       <div>
         <input id="mindmapLink" type="text" readonly">
         <button onclick="(() => {
@@ -59,12 +64,12 @@ export class CoCreateMindmap extends HTMLElement {
           const input = root.getElementById('mindmapLink');
           input.select();
           document.execCommand('copy');
-          this.textContent = 'Kopiert';
-          setTimeout(() => this.textContent = 'Kopieren', 1500);
-        })()" >Kopieren</button>
+          this.textContent = 'copied';
+          setTimeout(() => this.textContent = 'copy', 1500);
+        })()" >copy</button>
       </div>
       <button class="close" draggable="false"
-        onclick="this.closest('dialog').close()">Schließen</button>
+        onclick="this.closest('dialog').close()">close</button>
     </dialog>
 
          <img src="${iconOverview}" alt="Icon overview user"
@@ -75,7 +80,7 @@ export class CoCreateMindmap extends HTMLElement {
             <h2>User-Overview</h2>
             <div id="userListContainer"></div>
             <button class="close" 
-              onclick="this.closest('dialog').close()">Schließen</button>
+              onclick="this.closest('dialog').close()">close</button>
           </dialog>
 
           <img src="${iconDownload}" alt="Icon Download pdf"
@@ -87,10 +92,10 @@ export class CoCreateMindmap extends HTMLElement {
 
         <div id="ipLockOverlay">
           <div class="overlay-box">
-            <p id="overlayMessage">Möchtest du diese IP wirklich sperren?</p>
+            <p id="overlayMessage">Do you really want to block this IP?</p>
             <div class="overlay-buttons">
-              <button id="confirmLockBtn">Ja, sperren</button>
-              <button id="cancelLockBtn">Abbrechen</button>
+              <button id="confirmLockBtn">Yes, block it./button>
+              <button id="cancelLockBtn">Cancel</button>
             </div>
           </div>
         </div>    `;
