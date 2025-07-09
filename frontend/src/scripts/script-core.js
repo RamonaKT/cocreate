@@ -626,7 +626,7 @@ async function initializeAccessControl(shadowRoot) {
             return;
         }
     } catch (err) {
-        console.error("Fehler bei Login über IP:", err);
+        console.error("Error with login per IP:", err);
     }
     loadUsersForCurrentMindmap(shadowRoot);
     showNicknameModal(shadowRoot);
