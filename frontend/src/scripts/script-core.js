@@ -398,7 +398,7 @@ async function initializeAccessControl(shadowRoot) {
         if (!error && user && !user.locked) {
             userNickname = user.nickname;
             localStorage.setItem("mindmap_nickname", userNickname);
-            console.log("Automatisch über IP eingeloggt:", userNickname);
+            console.log("Autmoatically logged in per IP:", userNickname);
             shadowRoot.getElementById('nicknameModal')?.remove();
             return;
         }
@@ -562,7 +562,7 @@ function getSVGSource() {
 
 // Prompts the user for a title and saves the current mindmap SVG to Supabase.
 export async function saveCurrentMindmap() {
-    const title = prompt("Titel eingeben:");
+    const title = prompt("Enter title:");
     if (!title) return;
     const svgData = getSVGSource();
     const ip = await fetch('https://api.ipify.org').then(res => res.text());
@@ -784,7 +784,7 @@ async function loadUsersForCurrentMindmap(shadowRoot = document) {
     const container = shadowRoot.getElementById('userListContainer');
     container.innerHTML = ''; // vorher leeren
     if (!mindmapId) {
-        container.textContent = "Keine gültige Mindmap-ID.";
+        container.textContent = "No valid Mindmap-ID.";
         return;
     }
     const { data: users, error } = await supabase
@@ -792,12 +792,12 @@ async function loadUsersForCurrentMindmap(shadowRoot = document) {
         .select('nickname, locked, admin, ipadress')
         .eq('mindmap_id', mindmapId);
     if (error) {
-        container.textContent = "Fehler beim Laden der Nutzer.";
-        console.error("Fehler beim Laden der User:", error.message);
+        container.textContent = "Error loading User.";
+        console.error("Error loading User:", error.message);
         return;
     }
     if (!users || users.length === 0) {
-        container.textContent = "Keine Nutzer gefunden.";
+        container.textContent = "No user found.";
         return;
     }
     const currentUser = users.find(u => u.nickname === userNickname);

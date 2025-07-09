@@ -44,7 +44,7 @@ export class CoCreateMindmap extends HTMLElement {
           const fullUrl = \`\${window.location.origin}/?id=\${mindmapId}\`;
           linkEl.value = fullUrl;
         } else {
-          linkEl.value = 'Keine ID in URL gefunden.';
+          linkEl.value = 'No ID found in URL.';
         }
         dialog.showModal();
       })()">
