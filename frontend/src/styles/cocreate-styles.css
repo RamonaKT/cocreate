@@ -78,6 +78,7 @@ button {
     height: 4.6875rem;
     width: 4.6875rem;
     border-radius: 15%;
+    cursor: pointer;
   }
 
 
@@ -285,9 +286,10 @@ foreignObject input {
     font-size: var(--cocreate-font-size-base);
   }
 
-.sidebar mg {
+.sidebar img {
     height: 3rem;
     width: 3rem;
+    cursor: pointer;
  }
 
 

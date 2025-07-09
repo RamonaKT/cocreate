@@ -34,7 +34,7 @@ export class CoCreateMindmap extends HTMLElement {
 
       <div id="sidebar-left" class="sidebar">
           <img src="${iconManual}" alt="Icon manual"
-      style="cursor: pointer;" draggable="false" 
+           draggable="false" 
       onclick="(() => {
         const root = this.getRootNode();
         const dialog = root.getElementById('dialogIconManual');
@@ -59,7 +59,7 @@ export class CoCreateMindmap extends HTMLElement {
           const input = root.getElementById('mindmapLink');
           input.select();
           document.execCommand('copy');
-          this.textContent = '✔️ Kopiert';
+          this.textContent = 'Kopiert';
           setTimeout(() => this.textContent = 'Kopieren', 1500);
         })()" style="margin-top: 5px;">Kopieren</button>
       </div>
@@ -68,7 +68,7 @@ export class CoCreateMindmap extends HTMLElement {
     </dialog>
 
          <img src="${iconOverview}" alt="Icon overview user"
-            style="cursor: pointer;" draggable="false" 
+            draggable="false" 
             onclick="this.getRootNode().getElementById('dialogIconOverviewUser').showModal(); window.loadUsersForCurrentMindmap(this.getRootNode());">
 
           <dialog id="dialogIconOverviewUser">
@@ -79,10 +79,10 @@ export class CoCreateMindmap extends HTMLElement {
           </dialog>
 
           <img src="${iconDownload}" alt="Icon Download pdf"
-            class="pdfButton" id="downloadbtn" style="cursor: pointer;" draggable="false">
+            class="pdfButton" id="downloadbtn" draggable="false">
 
           <img src="${iconSave}" alt="Icon save" id="saveButton"
-            style="cursor: pointer;" draggable="false">
+            draggable="false">
         </div>
 
         <div id="ipLockOverlay">
