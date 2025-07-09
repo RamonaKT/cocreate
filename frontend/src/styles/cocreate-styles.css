@@ -1,5 +1,5 @@
 /* ===========================
-   🎨 GLOBALE VARIABLEN
+   GLOBALE VARIABLEN
    =========================== */
 :host {
   /* Farbvarianten für Knoten (node-template) */
@@ -26,7 +26,7 @@
 
 
 /* ===========================
-   📌 TYPOGRAFIE
+   TYPOGRAFIE
    =========================== */
 h2 {
   color: var(--cocreate-main-color);
@@ -34,7 +34,7 @@ h2 {
 
 
 /* ===========================
-   🧩 DIALOGFENSTER
+   DIALOGFENSTER
    =========================== */
 dialog {
   position: fixed;
@@ -46,7 +46,7 @@ dialog {
 
 
 /* ===========================
-   🔘 BUTTONS
+   BUTTONS
    =========================== */
 button {
   border-radius: var(--cocreate-radius-large);
@@ -57,7 +57,7 @@ button {
 
 
 /* ===========================
-   📂 SEITENLEISTE LINKS
+   SEITENLEISTE LINKS
    =========================== */
 #sidebar-left {
   margin-right: var(--cocreate-margin);
@@ -82,7 +82,7 @@ button {
 
 
 /* ===========================
-   🛠️ TOOLBAR MIT DRAG-ITEMS
+   TOOLBAR MIT DRAG-ITEMS
    =========================== */
 #toolbar {
   position: fixed;
@@ -98,7 +98,7 @@ button {
 
 
 /* ===========================
-   🧠 NODE-VORLAGEN (drag-drop)
+   NODE-VORLAGEN (drag-drop)
    =========================== */
 .node-template {
   width: 17vh;
@@ -120,7 +120,7 @@ button {
 
 
 /* ===========================
-   🧭 MINDMAP-BEREICH
+   MINDMAP-BEREICH
    =========================== */
 #mindmap-container {
   display: flex;
@@ -138,7 +138,7 @@ button {
 
 
 /* ===========================
-   🖼️ SVG-ZEICHENFLÄCHE
+   SVG-ZEICHENFLÄCHE
    =========================== */
 svg {
   border: 0.0625rem solid #ccc;
@@ -149,7 +149,7 @@ svg {
 
 
 /* ===========================
-   ✏️ DRAGGABLE SVG-ELEMENTE
+   DRAGGABLE SVG-ELEMENTE
    =========================== */
 .draggable ellipse,
 .draggable rect {
@@ -172,7 +172,7 @@ svg {
 
 
 /* ===========================
-   🔗 VERBINDUNGSLINIEN
+   VERBINDUNGSLINIEN
    =========================== */
 .connection-line.highlighted {
   stroke: var(--cocreate-highlight-color);
@@ -182,7 +182,7 @@ svg {
 
 
 /* ===========================
-   ✍️ INLINE-TEXTFELDER
+   INLINE-TEXTFELDER
    =========================== */
 foreignObject input {
   width: 100%;
@@ -201,7 +201,7 @@ foreignObject input {
 
 
 /* ===========================
-   🏷️ ADMIN-BADGE
+   ADMIN-BADGE
    =========================== */
 .badge.admin {
   background-color: var(--cocreate-admin-color);
@@ -215,7 +215,7 @@ foreignObject input {
 
 
 /* ===========================
-   🛑 MODALE OVERLAYS
+   MODALE OVERLAYS
    =========================== */
 #ipLockOverlay,
 #nicknameModal {
