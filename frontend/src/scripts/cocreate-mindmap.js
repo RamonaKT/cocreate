@@ -94,7 +94,7 @@ export class CoCreateMindmap extends HTMLElement {
           <div class="overlay-box">
             <p id="overlayMessage">Do you really want to block this IP?</p>
             <div class="overlay-buttons">
-              <button id="confirmLockBtn">Yes, block it./button>
+              <button id="confirmLockBtn">Yes, block it.</button>
               <button id="cancelLockBtn">Cancel</button>
             </div>
           </div>
