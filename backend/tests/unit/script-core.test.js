@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 
 // backend/tests/unit/script-core.test.js
 // ACHTUNG: Datei-Endung MUSS .test.js oder .test.mjs sein!
-// Du testest hier die Verwendung / Integration, nicht die interne Logik.
+// Du testest hier die Verwendung / Integration, nicht die interne Logik. (Fazit ChatGPT)
 
 
 describe('script-core mock functions', () => {
