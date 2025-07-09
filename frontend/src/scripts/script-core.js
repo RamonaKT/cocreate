@@ -1,9 +1,10 @@
 import { supabase } from '../../../backend/supabase/client.js';
-import { io } from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
+import { io } from "socket.io-client";
 import { getCreations, saveCreation } from '../../../backend/supabase/database.js';
 import { jsPDF } from 'jspdf';
-import { svg2pdf } from 'svg2pdf.js';
+import svg2pdf  from 'svg2pdf.js';
 import { hashIp } from './hash';
+
 
 const zoomStep = 0.025;
 const minZoom = 0.1;
@@ -21,6 +22,7 @@ const nodeStyles = {
     2: { r: 50, color: getCSSColor(2), label: 'Ebene 2', fontSize: 14 },
     3: { r: 40, color: getCSSColor(3), label: 'Ebene 3', fontSize: 12 },
 };
+
 
 let initialSyncDone = false;
 let dragLine = null;
@@ -132,14 +134,16 @@ function connectNodes(fromId, toId, fromNetwork = false) {
     }
 }
 
-function highlightNode(id, on) {
+
+export function highlightNode(id, on) {
     const node = allNodes.find(n => n.id === id);
     if (!node) return;
     const shape = node.group.querySelector('ellipse, rect');
     if (!shape) return;
     if (on) shape.classList.add('highlighted');
     else shape.classList.remove('highlighted');
-}
+
+
 export function createNicknameModal(shadowRoot = document) {
     if (!shadowRoot || shadowRoot === document) {
         console.warn('❗ Achtung: createNicknameModal wurde ohne ShadowRoot aufgerufen!');
