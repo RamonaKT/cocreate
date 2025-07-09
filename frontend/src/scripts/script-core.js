@@ -43,6 +43,7 @@ let viewBox = {
     w: initialViewBoxSize,
     h: initialViewBoxSize,
 };
+let mindmapTitle = "mindmap"; // Defaultwert
 
 function scheduleSVGSave(delay = 1000) {
     clearTimeout(saveTimeout);
@@ -608,7 +609,8 @@ export async function exportMindmapToPDF() {
         yOffset: 0,
         scale: 1
     });
-    pdf.save("mindmap.pdf");
+    const safeTitle = mindmapTitle.replace(/[^\w\-]+/g, "_"); // ersetzt unsichere Zeichen
+    pdf.save(`mindmap_${safeTitle}.pdf`);
 }
 
 window.exportMindmapToPDF = exportMindmapToPDF;
@@ -847,6 +849,7 @@ async function loadMindmapFromDB(id) {
         alert("Mindmap nicht gefunden.");
         return;
     }
+    mindmapTitle = data.title || "mindmap";
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(data.svg_code, "image/svg+xml");
     const loadedSVG = svgDoc.documentElement;
@@ -1117,11 +1120,11 @@ export function setupMindmap(shadowRoot) {
     const downloadBtn = shadowRoot.getElementById('downloadbtn');
     if (downloadBtn) {
         downloadBtn.addEventListener('click', () => {
-            const svgElement = shadowRoot.getElementById('mindmap');
-            if (svgElement) {
-                exportMindmapAsSVG(svgElement);
+            const pdfElement = shadowRoot.getElementById('mindmap');
+            if (pdfElement) {
+                exportMindmapToPDF(pdfElement);
             } else {
-                console.error("SVG nicht gefunden für Export.");
+                console.error("PDF nicht gefunden für Export.");
             }
         });
     }
