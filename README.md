@@ -1,61 +1,56 @@
-# cocreate
-Uniprojekt: Kollaborationstool in Form einer Mindmap
+# CoCreate Mindmap – Kollaboratives Mindmap-Tool
+Ein webbasiertes kollaboratives Mindmap-Tool, das es mehreren Nutzern ermöglicht, in Echtzeit gemeinsam an Mindmaps zu arbeiten. Die Anwendung nutzt Supabase für das Backend und Socket.io für Echtzeitkommunikation.
 
-# projekt beschreibung
+# Projektstruktur
 
-# für die girls
-wenn probleme mit container:
-node_modules löschen
-package-lock.json löschen
-npm install
-npm run build
-
-npm start ->  für ohne container
-
-# container starten
-docker an machen
-docker build -t cocreate-app .   -> wenn kein cache dann docker build --no-cache -t cocreate-app .
-docker run -p 1235:1235 -p 3000:3000 cocreate-app
-
-# projekt teilnehmer
-
-
-# projekt setup
-
-
-# projekt struktur
-my-project/
+.
+├── backend/ # Backend-Logik mit Supabase und Tests
+│ ├── supabase/ # Supabase-Client und DB-Logik
+│ ├── tests/unit/ # Unit-Tests für Hashing & Skript-Logik
+│ └── server.js # Einstiegspunkt des Backends
 │
-├── frontend/
-│   ├── public/               # Statische Dateien (z.B. index.html, Favicon, Bilder)
-│   ├── src/
-│   │   ├── components/       # Wiederverwendbare UI-Komponenten
-│   │   ├── pages/            # Seiten/Views
-│   │   ├── styles/           # CSS/SCSS-Dateien
-│   │   ├── assets/           # Bilder, Fonts, Icons etc.
-│   │   ├── utils/            # Hilfsfunktionen
-│   │   ├── App.js
-│   │   └── index.js
-│   └── tests/                # Frontend-Tests (unit/component/integration)
+├── dist/ # Build-Ordner für Deployment
+│ ├── assets/ # Build-Version der Assets
+│ └── index.html # Build-Version des Frontends
 │
-├── backend/
-│   ├── controllers/          # Routen-Logik
-│   ├── models/               # Datenmodelle
-│   ├── routes/               # API-Endpunkte
-│   ├── services/             # Business-Logik
-│   ├── utils/                # Hilfsfunktionen
-│   ├── middleware/           # Authentifizierung, Fehlerbehandlung
-│   ├── app.js                # Einstiegspunkt
-│   └── tests/                # Backend-Tests (unit/integration)
+├── frontend/src/ # Quellcode für das Frontend
+│ ├── assets/ # Icons & Logos
+│ ├── scripts/ # Zentrale Logik fürs Frontend (Mindmap, Hashing, Sockets etc.)
+│ └── styles/ # CSS-Dateien
 │
-├── config/                   # Konfigurationsdateien (z.B. .env, DB, API-Keys)
-│   ├── dev.env
-│   ├── prod.env
-│   └── test.env
-│
-├── .gitignore
-├── package.json
-├── README.md
-└── jest.config.js            # Beispiel für Testkonfiguration
+├── index.html # Haupt-HTML-Datei
+├── .env # Umgebungsvariablen
+├── Dockerfile # Für Containerisierung
+├── eslint.config.js # Linting-Konfiguration
+├── package.json # NPM-Paketinformationen
+└── README.md # Dieses Dokument
+
+
+## Features
+- Echtzeit-Zusammenarbeit an Mindmaps
+- WebSockets für Live-Synchronisierung
+- Benutzerfreundliches Frontend
+- Supabase als Datenbank
+- Unit-Tests für kritische Komponenten
+
+## Setup
+
+### Voraussetzungen
+- Node.js installiert
+- Supabase-Account & Projekt
+- (Optional) Docker für Container-Deployment
+
+### Installation + Ausführung
+1.	“npm install” im Terminal ausführen
+2.	“npm run build” im Terminal ausführen
+3.	“npm start” im Terminal ausführen 
+4.	http://localhost:1235 im Browser öffnen
+
+### Mit Docker:
+1.	“npm install” im Terminal ausführen
+2.	Docker desktop starten
+3.	“docker build -t cocreate-app-prod" im Terminal ausführen
+4.	“docker run -p 1235:1235 -p 3000:3000 cocreate-app-prod" im Terminal ausführen
+5.	http://localhost:1235 im Browser öffnen
 
 
