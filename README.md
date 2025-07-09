@@ -53,4 +53,7 @@ Ein webbasiertes kollaboratives Mindmap-Tool, das es mehreren Nutzern ermöglich
 4.	“docker run -p 1235:1235 -p 3000:3000 cocreate-app-prod" im Terminal ausführen
 5.	http://localhost:1235 im Browser öffnen
 
+## Zugang über Browser (falls möglich):
+1.	Mit Cisco Secure Client mit dem Hochschul-Server verbinden
+2.	http://141.72.13.151:8202 im Browser öffnen
 
