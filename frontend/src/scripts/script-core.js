@@ -56,6 +56,229 @@ let viewBox = {
 };
 let mindmapTitle = "mindmap"; // Default
 
+// Initializes the mindmap editing interface, including SVG interactions, event listeners, and zooming.
+export function setupMindmap(shadowRoot) {
+    shadowRoot.host.tabIndex = 0; // makes the host “focusable”
+    shadowRoot.host.focus();      // sets the focus directly
+    svg = shadowRoot.getElementById('mindmap');
+    if (!svg) {
+        console.error("SVG not found in Shadow DOM!");
+        return;
+    }
+    svg.style.touchAction = 'none';
+    const saveBtn = shadowRoot.getElementById('saveButton');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveCurrentMindmap);
+    }
+    shadowRoot.querySelectorAll('.node-template').forEach(el => {
+        el.addEventListener('dragstart', e => {
+            draggedType = e.target.getAttribute('data-type');
+        });
+    });
+    svg.addEventListener('dragover', e => e.preventDefault());
+    svg.addEventListener('drop', e => {
+        e.preventDefault();
+        const svgPoint = getSVGPoint(e.clientX, e.clientY);
+        createDraggableNode(svgPoint.x, svgPoint.y, draggedType);
+    });
+    svg.addEventListener('pointermove', e => {
+        if (dragLine) {
+            const svgPoint = getSVGPoint(e.clientX, e.clientY);
+            dragLine.setAttribute("x2", svgPoint.x);
+            dragLine.setAttribute("y2", svgPoint.y);
+        }
+    });
+    dragLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    svg.appendChild(dragLine);
+    if (dragLine) {
+        svg.removeChild(dragLine);
+        dragLine = null;
+    }
+    svg.addEventListener('click', () => {
+        if (selectedNode) {
+            highlightNode(selectedNode, false);
+            selectedNode = null;
+        }
+        if (selectedConnection) {
+            selectedConnection.classList.remove('highlighted');
+            selectedConnection = null;
+        }
+    });
+    const confirmBtn = shadowRoot.getElementById('confirmLockBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+            if (userToLock) {
+                await lockUserByNickname(userToLock);
+                const messageBox = shadowRoot.getElementById('overlayMessage');
+                messageBox.textContent = `locking IP from "${userToLock}" was successful.`;
+                shadowRoot.querySelector('.overlay-buttons').style.display = 'none';
+                setTimeout(() => {
+                    shadowRoot.getElementById('ipLockOverlay').style.display = 'none';
+                    shadowRoot.querySelector('.overlay-buttons').style.display = 'flex';
+                    userToLock = null;
+                }, 2000);
+            }
+        });
+    }
+    const cancelBtn = shadowRoot.getElementById('cancelLockBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            shadowRoot.getElementById('ipLockOverlay').style.display = 'none';
+            userToLock = null;
+        });
+    }
+    shadowRoot.host.addEventListener("keydown", (e) => {
+        const path = e.composedPath();
+        const isTyping = path.some(el =>
+            el instanceof HTMLElement &&
+            (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+        );
+        if (isTyping) return;
+        switch (e.key.toLowerCase()) {
+            case 'w':
+            case 'arrowup':
+                viewBox.y -= panStep * (viewBox.h / initialViewBoxSize);
+                updateViewBox();
+                break;
+            case 's':
+            case 'arrowdown':
+                viewBox.y += panStep * (viewBox.h / initialViewBoxSize);
+                updateViewBox();
+                break;
+            case 'a':
+            case 'arrowleft':
+                viewBox.x -= panStep * (viewBox.w / initialViewBoxSize);
+                updateViewBox();
+                break;
+            case 'd':
+            case 'arrowright':
+                viewBox.x += panStep * (viewBox.w / initialViewBoxSize);
+                updateViewBox();
+                break;
+        }
+    });
+
+    // Drag-move
+    svg.addEventListener('pointermove', e => {
+        if (!dragTarget) return;
+        const point = getSVGPoint(e.clientX, e.clientY);
+        const id = dragTarget.dataset.nodeId;
+        const node = allNodes.find(n => n.id === id);
+        if (!node) return;
+        const newX = point.x - offset.x;
+        const newY = point.y - offset.y;
+        dragTarget.setAttribute("transform", `translate(${newX}, ${newY})`);
+        node.x = newX;
+        node.y = newY;
+
+        emitNodeMoving({
+            id: node.id,
+            x: node.x,
+            y: node.y,
+        });
+        //  }
+        console.log(" node-moving sent", node.id, node.x, node.y);
+        updateConnections(id);
+    });
+    // Deselect on SVG-Click
+    svg.addEventListener('click', () => {
+        if (selectedNode !== null) {
+            highlightNode(selectedNode, false);
+            selectedNode = null;
+        }
+        if (selectedConnection) {
+            selectedConnection.classList.remove('highlighted');
+            selectedConnection = null;
+        }
+    });
+    // Delete button for removing nodes or connections
+    document.addEventListener('keydown', (e) => {
+        const path = e.composedPath();
+        const isTyping = path.some(el =>
+            el instanceof HTMLElement &&
+            (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+        );
+        if (isTyping) return;
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            if (selectedConnection) {
+                const fromId = selectedConnection.dataset.from;
+                const toId = selectedConnection.dataset.to;
+                if (svg.contains(selectedConnection)) {
+                    svg.removeChild(selectedConnection);
+                }
+                allConnections = allConnections.filter(conn =>
+                    conn.line !== selectedConnection
+                );
+                selectedConnection = null;
+                emitConnectionDeleted({
+                    fromId,
+                    toId
+                });
+                scheduleSVGSave();
+                return;
+            }
+            if (selectedNode) {
+                const nodeIndex = allNodes.findIndex(n => n.id === selectedNode);
+                if (nodeIndex === -1) return;
+                const node = allNodes[nodeIndex];
+                svg.removeChild(node.group);
+                allNodes.splice(nodeIndex, 1);
+                emitNodeDeleted({ id: selectedNode });
+                scheduleSVGSave();
+                // Delete Connection to Node
+                allConnections = allConnections.filter(conn => {
+                    if (conn.fromId === selectedNode || conn.toId === selectedNode) {
+                        svg.removeChild(conn.line);
+                        return false;
+                    }
+                    return true;
+                });
+                selectedNode = null;
+            }
+        }
+    });
+    svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+    // Zoom with mousewheel
+    svg.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        // Zoom direction
+        zoom += e.deltaY > 0 ? -zoomStep : zoomStep;
+        zoom = Math.min(Math.max(zoom, minZoom), maxZoom);
+        // Zoom by mouse position 
+        const mouseSVG = getSVGPoint(e.clientX, e.clientY);
+        // New ViewBox size based on zoom
+        const newWidth = initialViewBoxSize / zoom;
+        const newHeight = initialViewBoxSize / zoom;
+        // Move ViewBox so that zoom remains at mouse position
+        viewBox.x = mouseSVG.x - (mouseSVG.x - viewBox.x) * (newWidth / viewBox.w);
+        viewBox.y = mouseSVG.y - (mouseSVG.y - viewBox.y) * (newHeight / viewBox.h);
+        viewBox.w = newWidth;
+        viewBox.h = newHeight;
+        updateViewBox();
+    });
+    function updateViewBox() {
+        svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+    }
+    const downloadBtn = shadowRoot.getElementById('downloadbtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            const pdfElement = shadowRoot.getElementById('mindmap');
+            if (pdfElement) {
+                exportMindmapToPDF(pdfElement);
+            } else {
+                console.error("PDF nicht gefunden für Export.");
+            }
+        });
+    }
+    initializeAccessControl(shadowRoot);
+    // If an ID is available, load the mind map
+    if (mindmapId) {
+        loadMindmapFromDB(mindmapId);
+    }
+    console.log("✅ Mindmap im Shadow DOM vollständig initialisiert");
+}
+
 // Schedules saving the current SVG to the database after a delay (default: 1 second).
 function scheduleSVGSave(delay = 1000) {
     clearTimeout(saveTimeout);
@@ -916,229 +1139,6 @@ async function loadMindmapFromDB(id) {
     if (titleEl && data.title) {
         titleEl.textContent = data.title;
     }
-}
-
-// Initializes the mindmap editing interface, including SVG interactions, event listeners, and zooming.
-export function setupMindmap(shadowRoot) {
-    shadowRoot.host.tabIndex = 0; // makes the host “focusable”
-    shadowRoot.host.focus();      // sets the focus directly
-    svg = shadowRoot.getElementById('mindmap');
-    if (!svg) {
-        console.error("SVG not found in Shadow DOM!");
-        return;
-    }
-    svg.style.touchAction = 'none';
-    const saveBtn = shadowRoot.getElementById('saveButton');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveCurrentMindmap);
-    }
-    shadowRoot.querySelectorAll('.node-template').forEach(el => {
-        el.addEventListener('dragstart', e => {
-            draggedType = e.target.getAttribute('data-type');
-        });
-    });
-    svg.addEventListener('dragover', e => e.preventDefault());
-    svg.addEventListener('drop', e => {
-        e.preventDefault();
-        const svgPoint = getSVGPoint(e.clientX, e.clientY);
-        createDraggableNode(svgPoint.x, svgPoint.y, draggedType);
-    });
-    svg.addEventListener('pointermove', e => {
-        if (dragLine) {
-            const svgPoint = getSVGPoint(e.clientX, e.clientY);
-            dragLine.setAttribute("x2", svgPoint.x);
-            dragLine.setAttribute("y2", svgPoint.y);
-        }
-    });
-    dragLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    svg.appendChild(dragLine);
-    if (dragLine) {
-        svg.removeChild(dragLine);
-        dragLine = null;
-    }
-    svg.addEventListener('click', () => {
-        if (selectedNode) {
-            highlightNode(selectedNode, false);
-            selectedNode = null;
-        }
-        if (selectedConnection) {
-            selectedConnection.classList.remove('highlighted');
-            selectedConnection = null;
-        }
-    });
-    const confirmBtn = shadowRoot.getElementById('confirmLockBtn');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', async () => {
-            if (userToLock) {
-                await lockUserByNickname(userToLock);
-                const messageBox = shadowRoot.getElementById('overlayMessage');
-                messageBox.textContent = `locking IP from "${userToLock}" was successful.`;
-                shadowRoot.querySelector('.overlay-buttons').style.display = 'none';
-                setTimeout(() => {
-                    shadowRoot.getElementById('ipLockOverlay').style.display = 'none';
-                    shadowRoot.querySelector('.overlay-buttons').style.display = 'flex';
-                    userToLock = null;
-                }, 2000);
-            }
-        });
-    }
-    const cancelBtn = shadowRoot.getElementById('cancelLockBtn');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            shadowRoot.getElementById('ipLockOverlay').style.display = 'none';
-            userToLock = null;
-        });
-    }
-    shadowRoot.host.addEventListener("keydown", (e) => {
-        const path = e.composedPath();
-        const isTyping = path.some(el =>
-            el instanceof HTMLElement &&
-            (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
-        );
-        if (isTyping) return;
-        switch (e.key.toLowerCase()) {
-            case 'w':
-            case 'arrowup':
-                viewBox.y -= panStep * (viewBox.h / initialViewBoxSize);
-                updateViewBox();
-                break;
-            case 's':
-            case 'arrowdown':
-                viewBox.y += panStep * (viewBox.h / initialViewBoxSize);
-                updateViewBox();
-                break;
-            case 'a':
-            case 'arrowleft':
-                viewBox.x -= panStep * (viewBox.w / initialViewBoxSize);
-                updateViewBox();
-                break;
-            case 'd':
-            case 'arrowright':
-                viewBox.x += panStep * (viewBox.w / initialViewBoxSize);
-                updateViewBox();
-                break;
-        }
-    });
-
-    // Drag-move
-    svg.addEventListener('pointermove', e => {
-        if (!dragTarget) return;
-        const point = getSVGPoint(e.clientX, e.clientY);
-        const id = dragTarget.dataset.nodeId;
-        const node = allNodes.find(n => n.id === id);
-        if (!node) return;
-        const newX = point.x - offset.x;
-        const newY = point.y - offset.y;
-        dragTarget.setAttribute("transform", `translate(${newX}, ${newY})`);
-        node.x = newX;
-        node.y = newY;
-
-        emitNodeMoving({
-            id: node.id,
-            x: node.x,
-            y: node.y,
-        });
-        //  }
-        console.log(" node-moving sent", node.id, node.x, node.y);
-        updateConnections(id);
-    });
-    // Deselect on SVG-Click
-    svg.addEventListener('click', () => {
-        if (selectedNode !== null) {
-            highlightNode(selectedNode, false);
-            selectedNode = null;
-        }
-        if (selectedConnection) {
-            selectedConnection.classList.remove('highlighted');
-            selectedConnection = null;
-        }
-    });
-    // Delete button for removing nodes or connections
-    document.addEventListener('keydown', (e) => {
-        const path = e.composedPath();
-        const isTyping = path.some(el =>
-            el instanceof HTMLElement &&
-            (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
-        );
-        if (isTyping) return;
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-            e.preventDefault();
-            if (selectedConnection) {
-                const fromId = selectedConnection.dataset.from;
-                const toId = selectedConnection.dataset.to;
-                if (svg.contains(selectedConnection)) {
-                    svg.removeChild(selectedConnection);
-                }
-                allConnections = allConnections.filter(conn =>
-                    conn.line !== selectedConnection
-                );
-                selectedConnection = null;
-                emitConnectionDeleted({
-                    fromId,
-                    toId
-                });
-                scheduleSVGSave();
-                return;
-            }
-            if (selectedNode) {
-                const nodeIndex = allNodes.findIndex(n => n.id === selectedNode);
-                if (nodeIndex === -1) return;
-                const node = allNodes[nodeIndex];
-                svg.removeChild(node.group);
-                allNodes.splice(nodeIndex, 1);
-                emitNodeDeleted({ id: selectedNode });
-                scheduleSVGSave();
-                // Delete Connection to Node
-                allConnections = allConnections.filter(conn => {
-                    if (conn.fromId === selectedNode || conn.toId === selectedNode) {
-                        svg.removeChild(conn.line);
-                        return false;
-                    }
-                    return true;
-                });
-                selectedNode = null;
-            }
-        }
-    });
-    svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-    // Zoom with mousewheel
-    svg.addEventListener("wheel", (e) => {
-        e.preventDefault();
-        // Zoom direction
-        zoom += e.deltaY > 0 ? -zoomStep : zoomStep;
-        zoom = Math.min(Math.max(zoom, minZoom), maxZoom);
-        // Zoom by mouse position 
-        const mouseSVG = getSVGPoint(e.clientX, e.clientY);
-        // New ViewBox size based on zoom
-        const newWidth = initialViewBoxSize / zoom;
-        const newHeight = initialViewBoxSize / zoom;
-        // Move ViewBox so that zoom remains at mouse position
-        viewBox.x = mouseSVG.x - (mouseSVG.x - viewBox.x) * (newWidth / viewBox.w);
-        viewBox.y = mouseSVG.y - (mouseSVG.y - viewBox.y) * (newHeight / viewBox.h);
-        viewBox.w = newWidth;
-        viewBox.h = newHeight;
-        updateViewBox();
-    });
-    function updateViewBox() {
-        svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-    }
-    const downloadBtn = shadowRoot.getElementById('downloadbtn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            const pdfElement = shadowRoot.getElementById('mindmap');
-            if (pdfElement) {
-                exportMindmapToPDF(pdfElement);
-            } else {
-                console.error("PDF nicht gefunden für Export.");
-            }
-        });
-    }
-    initializeAccessControl(shadowRoot);
-    // If an ID is available, load the mind map
-    if (mindmapId) {
-        loadMindmapFromDB(mindmapId);
-    }
-    console.log("✅ Mindmap im Shadow DOM vollständig initialisiert");
 }
 
 // Exports the current mindmap SVG as a downloadable .svg file.
