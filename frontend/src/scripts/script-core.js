@@ -895,6 +895,11 @@ async function loadMindmapFromDB(id) {
             scheduleSVGSave();
         }
     });
+    // Titel-Element aktualisieren (außerhalb Shadow DOM)
+    const titleEl = document.getElementById('mindmapTitle');
+    if (titleEl && data.title) {
+        titleEl.textContent = data.title;
+    }
 }
 
 export function setupMindmap(shadowRoot) {
