@@ -250,6 +250,7 @@ function addEventListenersToNode(group, id, r) {
         fo.setAttribute("height", 20);
         const input = document.createElement("input");
         input.setAttribute("type", "text");
+        input.setAttribute("maxlength", "24");
         input.setAttribute("value", text.textContent);
         fo.appendChild(input);
         fo.style.pointerEvents = 'all';
@@ -257,13 +258,48 @@ function addEventListenersToNode(group, id, r) {
         input.focus();
         const save = async () => {
 
-            const value = input.value.trim();
-            const safeValue = value || "...";
-            text.textContent = safeValue;
+            /* const value = input.value.trim();
+ 
+             // Begrenzung auf 30 Zeichen
+     if (value.length > 30) {
+         value = value.slice(0, 30);
+     }
+             const safeValue = value || "...";
+             text.textContent = safeValue;
+             if (group.contains(fo)) {
+                 group.removeChild(fo);
+             }*/
+
+            let valueRaw = input.value.trim();
+
+            // Wenn leer, Standardwert setzen
+            const value = valueRaw.length ? valueRaw.slice(0, 24) : "...";
+
+            // Zeilen aufteilen nach je 8 Zeichen
+            const lines = [];
+            for (let i = 0; i < value.length; i += 12) {
+                lines.push(value.slice(i, i + 12));
+            }
+
+            // Vorherigen Textinhalt löschen
+            while (text.firstChild) {
+                text.removeChild(text.firstChild);
+            }
+
+            // Neue <tspan>-Zeilen hinzufügen
+            lines.forEach((line, i) => {
+                const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                tspan.setAttribute("x", "0");
+                tspan.setAttribute("dy", i === 0 ? "0" : "1.2em");
+                tspan.textContent = line;
+                text.appendChild(tspan);
+            });
+
+            // Eingabe-Feld entfernen
             if (group.contains(fo)) {
                 group.removeChild(fo);
             }
-            emitNodeRenamed({ id, text: safeValue });
+            emitNodeRenamed({ id, text: value });
 
             try {
                 await saveSVGToSupabase();
@@ -335,6 +371,7 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
     text.setAttribute("font-size", style.fontSize);
     text.setAttribute("text-anchor", "middle");
     text.setAttribute("alignment-baseline", "middle");
+
     text.textContent = "...";
     group.appendChild(text);
     allNodes.push({ id, group, x, y, r: style.r });
