@@ -29,7 +29,10 @@ export class CoCreateMindmap extends HTMLElement {
       </div>
 
       <div id="mindmap-container">
-        <div id="sidebar-left" class="sidebar">
+        <svg id="mindmap" width="1000" height="600"></svg>
+      </div>
+
+      <div id="sidebar-left" class="sidebar">
           <img src="${iconManual}" alt="Icon manual"
             style="cursor: pointer;" draggable="false" 
             onclick="this.getRootNode().getElementById('dialogIconManual').showModal()">
@@ -67,11 +70,7 @@ export class CoCreateMindmap extends HTMLElement {
               <button id="cancelLockBtn">Abbrechen</button>
             </div>
           </div>
-        </div>
-
-        <svg id="mindmap" width="1000" height="600"></svg>
-      </div>
-    `;
+        </div>    `;
 
     this.shadowRoot.appendChild(container);
     setupMindmap(this.shadowRoot);
