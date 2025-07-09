@@ -21,11 +21,10 @@ jobs:
         run: npm install
 
       # Optional (later when Errors are fixed)
-      # - name: Lint the code
-      #   run: npm run lint
-      #   continue-on-error: true
+      - name: Lint the code
+        run: npm run lint
+        continue-on-error: true
 
-      # Optional (when tests are done)
       - name: Run tests
         run: npm test
 
