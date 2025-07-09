@@ -1,7 +1,33 @@
 :root {
   /* Base colors for various interface elements */
   --secondary-main-color: #797ec6;
+  --color-level-1: #797ec6;
+  --color-level-2: #a4a9ea;
+  --color-level-3: #ced2ff;
 }
+
+
+/* ===========================
+   NODE TEMPLATES (drag-drop)
+   =========================== */
+.node-template {
+  width: 17vh;
+  height: 5vh;
+  border-radius: var(--cocreate-radius-large);
+  border: 0.125rem solid black;
+  color: black;
+  line-height: 2.5rem;
+  cursor: grab;
+  user-select: none;
+  text-align: center;
+  font-size: var(--cocreate-font-size-large);
+
+  /* Visual differentiation by type */
+  &[data-type="1"] { background: var(--color-level-1); }
+  &[data-type="2"] { background: var(--color-level-2); }
+  &[data-type="3"] { background: var(--color-level-3); }
+}
+
 
 /* ===========================
    BASE STYLES FOR THE DOCUMENT
