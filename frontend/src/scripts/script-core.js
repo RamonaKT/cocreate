@@ -27,9 +27,9 @@ const panStep = 20;
 const getCSSColor = (level) =>
     getComputedStyle(document.documentElement).getPropertyValue(`--color-level-${level}`).trim();
 const nodeStyles = {
-    1: { r: 60, color: getCSSColor(1), label: 'Ebene 1', fontSize: 16 },
-    2: { r: 50, color: getCSSColor(2), label: 'Ebene 2', fontSize: 14 },
-    3: { r: 40, color: getCSSColor(3), label: 'Ebene 3', fontSize: 12 },
+    1: { r: 60, color: getCSSColor(1), label: 'Item 1', fontSize: 16 },
+    2: { r: 50, color: getCSSColor(2), label: 'Item 2', fontSize: 14 },
+    3: { r: 40, color: getCSSColor(3), label: 'Item 3', fontSize: 12 },
 };
 
 
