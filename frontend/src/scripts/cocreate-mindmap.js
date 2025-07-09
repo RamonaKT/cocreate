@@ -34,15 +34,38 @@ export class CoCreateMindmap extends HTMLElement {
 
       <div id="sidebar-left" class="sidebar">
           <img src="${iconManual}" alt="Icon manual"
-            style="cursor: pointer;" draggable="false" 
-            onclick="this.getRootNode().getElementById('dialogIconManual').showModal()">
+      style="cursor: pointer;" draggable="false" 
+      onclick="(() => {
+        const root = this.getRootNode();
+        const dialog = root.getElementById('dialogIconManual');
+        const linkEl = root.getElementById('mindmapLink');
+        const mindmapId = new URLSearchParams(window.location.search).get('id');
+        if (mindmapId) {
+          const fullUrl = \`\${window.location.origin}/?id=\${mindmapId}\`;
+          linkEl.value = fullUrl;
+        } else {
+          linkEl.value = 'Keine ID in URL gefunden.';
+        }
+        dialog.showModal();
+      })()">
 
-          <dialog id="dialogIconManual">
-            <h2>Quick-Start manuell</h2>
-            <p>save to open new mindmap. everyone needs access to server. share id. have fun.</p>
-            <button class="close" draggable="false"
-              onclick="this.closest('dialog').close()">Schließen</button>
-          </dialog>
+    <dialog id="dialogIconManual">
+      <h2>Quick-Start manual</h2>
+      <p>save to open new mindmap. everyone needs access to server. share id. have fun.</p>
+      <div style="margin-top: 10px;">
+        <input id="mindmapLink" type="text" readonly style="width: 100%; padding: 5px; font-size: 0.9rem;">
+        <button onclick="(() => {
+          const root = this.getRootNode();
+          const input = root.getElementById('mindmapLink');
+          input.select();
+          document.execCommand('copy');
+          this.textContent = '✔️ Kopiert';
+          setTimeout(() => this.textContent = 'Kopieren', 1500);
+        })()" style="margin-top: 5px;">Kopieren</button>
+      </div>
+      <button class="close" draggable="false"
+        onclick="this.closest('dialog').close()">Schließen</button>
+    </dialog>
 
          <img src="${iconOverview}" alt="Icon overview user"
             style="cursor: pointer;" draggable="false" 
