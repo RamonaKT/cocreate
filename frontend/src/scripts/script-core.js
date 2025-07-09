@@ -2,7 +2,7 @@ import { supabase } from '../../../backend/supabase/client.js';
 import { io } from "socket.io-client";
 import { getCreations, saveCreation } from '../../../backend/supabase/database.js';
 import { jsPDF } from 'jspdf';
-import svg2pdf  from 'svg2pdf.js';
+import { svg2pdf } from 'svg2pdf.js';
 import { hashIp } from './hash';
 
 
