@@ -3,6 +3,19 @@ Uniprojekt: Kollaborationstool in Form einer Mindmap
 
 # projekt beschreibung
 
+# für die girls
+wenn probleme mit container:
+node_modules löschen
+package-lock.json löschen
+npm install
+npm run build
+
+npm start ->  für ohne container
+
+# container starten
+docker an machen
+docker build -t cocreate-app .   -> wenn kein cache dann docker build --no-cache -t cocreate-app .
+docker run -p 1235:1235 -p 3000:3000 cocreate-app
 
 # projekt teilnehmer
 
