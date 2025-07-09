@@ -281,7 +281,7 @@ foreignObject input {
     left: 0;
     top: 0;
     height: 100vh;
-    background-color: white;
+    background-color: transparent;
     z-index: 1000;
     font-size: var(--cocreate-font-size-base);
   }
