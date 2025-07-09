@@ -829,6 +829,7 @@ async function loadUsersForCurrentMindmap(shadowRoot = document) {
     });
 }
 
+// Temporarily locks a user (by nickname) from editing the mindmap.
 async function lockUserByNickname(nickname) {
     const lockUntil = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 Minuten
     const { error } = await supabase
@@ -836,14 +837,15 @@ async function lockUserByNickname(nickname) {
         .update({ locked: true, locked_until: lockUntil })
         .eq('nickname', nickname);
     if (error) {
-        alert("Fehler beim Sperren: " + error.message);
+        alert("Error Blocking: " + error.message);
         return;
     }
-    console.log(`User "${nickname}" wurde bis ${lockUntil} gesperrt.`);
+    console.log(`User "${nickname}" blocked until ${lockUntil}.`);
 }
 
 window.loadUsersForCurrentMindmap = loadUsersForCurrentMindmap;
 
+// Loads an existing mindmap from Supabase, restores its SVG, and re-initializes nodes and connections.
 async function loadMindmapFromDB(id) {
     const { data, error } = await supabase
         .from('creations')
@@ -851,16 +853,16 @@ async function loadMindmapFromDB(id) {
         .eq('creationid', id)
         .single();
     if (error || !data) {
-        alert("Mindmap nicht gefunden.");
+        alert("Mindmap not found.");
         return;
     }
     mindmapTitle = data.title || "mindmap";
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(data.svg_code, "image/svg+xml");
     const loadedSVG = svgDoc.documentElement;
-    svg.innerHTML = loadedSVG.innerHTML; // Inhalte übernehmen
+    svg.innerHTML = loadedSVG.innerHTML; // copy items
     svg.setAttribute("viewBox", loadedSVG.getAttribute("viewBox") || "0 0 1000 600");
-    // Initialisiere geladene Knoten
+    // Initialize loaded nodes
     svg.querySelectorAll('g.draggable').forEach(group => {
         const id = group.dataset.nodeId || 'node' + allNodes.length;
         const transform = group.getAttribute("transform");
@@ -871,14 +873,13 @@ async function loadMindmapFromDB(id) {
         const style = nodeStyles[type];
         const r = style?.r || 40;
         allNodes.push({ id, group, x, y, r: parseFloat(r) });
-        // EventListener hinzufügen wie in createDraggableNode()
         addEventListenersToNode(group, id, parseFloat(r));
     });
     svg.querySelectorAll('line.connection-line').forEach(line => {
         const fromId = line.dataset.from;
         const toId = line.dataset.to;
         if (fromId && toId) {
-            // Event-Handling hinzufügen
+            // Adding Event-Handling
             line.addEventListener("click", e => {
                 e.stopPropagation();
                 if (selectedNode !== null) {
@@ -902,7 +903,6 @@ async function loadMindmapFromDB(id) {
                     toId: line.dataset.to
                 });
                 scheduleSVGSave();
-                //   }
                 allConnections = allConnections.filter(conn => conn.line !== line);
                 if (selectedConnection === line) selectedConnection = null;
             })
@@ -913,12 +913,13 @@ async function loadMindmapFromDB(id) {
     });
 }
 
+// Initializes the mindmap editing interface, including SVG interactions, event listeners, and zooming.
 export function setupMindmap(shadowRoot) {
-    shadowRoot.host.tabIndex = 0; // macht den Host "fokusierbar"
-    shadowRoot.host.focus();      // setzt direkt den Fokus
+    shadowRoot.host.tabIndex = 0; // makes the host “focusable”
+    shadowRoot.host.focus();      // sets the focus directly
     svg = shadowRoot.getElementById('mindmap');
     if (!svg) {
-        console.error("SVG nicht im Shadow DOM gefunden!");
+        console.error("SVG not found in Shadow DOM!");
         return;
     }
     svg.style.touchAction = 'none';
@@ -1014,7 +1015,7 @@ export function setupMindmap(shadowRoot) {
         }
     });
 
-    // Drag-Bewegung
+    // Drag-move
     svg.addEventListener('pointermove', e => {
         if (!dragTarget) return;
         const point = getSVGPoint(e.clientX, e.clientY);
@@ -1033,10 +1034,10 @@ export function setupMindmap(shadowRoot) {
             y: node.y,
         });
         //  }
-        console.log(" node-moving gesendet", node.id, node.x, node.y);
+        console.log(" node-moving sent", node.id, node.x, node.y);
         updateConnections(id);
     });
-    // Deselect auf SVG-Klick
+    // Deselect on SVG-Click
     svg.addEventListener('click', () => {
         if (selectedNode !== null) {
             highlightNode(selectedNode, false);
@@ -1047,7 +1048,7 @@ export function setupMindmap(shadowRoot) {
             selectedConnection = null;
         }
     });
-    // Delete-Taste zum Entfernen von Knoten oder Verbindung
+    // Delete button for removing nodes or connections
     document.addEventListener('keydown', (e) => {
         const path = e.composedPath();
         const isTyping = path.some(el =>
@@ -1067,7 +1068,6 @@ export function setupMindmap(shadowRoot) {
                     conn.line !== selectedConnection
                 );
                 selectedConnection = null;
-
                 emitConnectionDeleted({
                     fromId,
                     toId
@@ -1081,11 +1081,9 @@ export function setupMindmap(shadowRoot) {
                 const node = allNodes[nodeIndex];
                 svg.removeChild(node.group);
                 allNodes.splice(nodeIndex, 1);
-
                 emitNodeDeleted({ id: selectedNode });
                 scheduleSVGSave();
-
-                // Verbindungen mit dem Knoten entfernen
+                // Delete Connection to Node
                 allConnections = allConnections.filter(conn => {
                     if (conn.fromId === selectedNode || conn.toId === selectedNode) {
                         svg.removeChild(conn.line);
@@ -1098,18 +1096,18 @@ export function setupMindmap(shadowRoot) {
         }
     });
     svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
-    // Zoom mit Mausrad
+    // Zoom with mousewheel
     svg.addEventListener("wheel", (e) => {
         e.preventDefault();
-        // Zoomrichtung
+        // Zoom direction
         zoom += e.deltaY > 0 ? -zoomStep : zoomStep;
         zoom = Math.min(Math.max(zoom, minZoom), maxZoom);
-        // Zoom um Mausposition (optional)
+        // Zoom by mouse position 
         const mouseSVG = getSVGPoint(e.clientX, e.clientY);
-        // Neue ViewBox-Größe basierend auf Zoom
+        // New ViewBox size based on zoom
         const newWidth = initialViewBoxSize / zoom;
         const newHeight = initialViewBoxSize / zoom;
-        // ViewBox so verschieben, dass Zoom um Mausposition bleibt
+        // Move ViewBox so that zoom remains at mouse position
         viewBox.x = mouseSVG.x - (mouseSVG.x - viewBox.x) * (newWidth / viewBox.w);
         viewBox.y = mouseSVG.y - (mouseSVG.y - viewBox.y) * (newHeight / viewBox.h);
         viewBox.w = newWidth;
@@ -1131,13 +1129,16 @@ export function setupMindmap(shadowRoot) {
         });
     }
     initializeAccessControl(shadowRoot);
-    // Falls eine ID vorhanden ist, lade die Mindmap
+    // If an ID is available, load the mind map
     if (mindmapId) {
         loadMindmapFromDB(mindmapId);
     }
     console.log("✅ Mindmap im Shadow DOM vollständig initialisiert");
 }
 
+// Exports the current mindmap SVG as a downloadable .svg file.
+// Converts the SVG element into a Blob, generates a temporary URL,
+// and triggers a download by simulating a click on an anchor element.
 function exportMindmapAsSVG(svgElement) {
     const serializer = new XMLSerializer();
     const source = serializer.serializeToString(svgElement);
