@@ -65,20 +65,20 @@ button {
   background-color: transparent;
   position: absolute;
   left: 1vw;
-  top: 8vh;
+  top: 10vh;
   width: 25vh;
   padding: var(--cocreate-padding);
   text-align: left;
   overflow-y: auto;
   font-size: var(--cocreate-font-size-small);
+}
 
-  /* Bild innerhalb der Sidebar */
-  img {
+/* Bild innerhalb der Sidebar */
+.sidebar img {
     height: 4.6875rem;
     width: 4.6875rem;
     border-radius: 15%;
   }
-}
 
 
 /* ===========================
@@ -93,7 +93,7 @@ button {
   background: transparent;
   height: 6vh;
   right: 1vw;
-  top: 8vh;
+  top: 10vh;
 }
 
 
@@ -253,5 +253,59 @@ foreignObject input {
     text-align: center;
     margin: 0 auto;
     display: block;
+  }
+}
+
+/* ===========================
+   MEDIA QUERIES
+   =========================== */
+@media (max-width: 768px) {
+  :host {
+    --cocreate-font-size-base: 0.9rem;
+    --cocreate-font-size-small: 0.75rem;
+    --cocreate-font-size-large: 1rem;
+  }
+
+  #sidebar-left {
+    position: fixed;
+    width: 80vw;
+    max-width: none;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background-color: white;
+    z-index: 1000;
+    font-size: var(--cocreate-font-size-base);
+  }
+
+.sidebar mg {
+    height: 3rem;
+    width: 3rem;
+ }
+
+
+  #toolbar {
+    flex-direction: column;
+    height: auto;
+    gap: 1rem;
+    top: auto;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  #mindmap-container {
+    flex-direction: column;
+    margin: 0.5rem;
+  }
+
+  #mindmap {
+    border-width: 0.0625rem;
+  }
+
+  dialog {
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    padding: 1rem;
   }
 }
