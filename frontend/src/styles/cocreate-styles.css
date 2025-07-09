@@ -1,24 +1,24 @@
 /* ===========================
-   GLOBALE VARIABLEN
+   GLOBAL VARIABLES
    =========================== */
 :host {
-  /* Farbvarianten für Knoten (node-template) */
-  --ccolor-level-1: #797ec6;
-  --ccolor-level-2: #a4a9ea;
-  --ccolor-level-3: #ced2ff;
+  /* Color variants for nodes (node-template) */
+  --color-level-1: #797ec6;
+  --color-level-2: #a4a9ea;
+  --color-level-3: #ced2ff;
 
-  /* Hauptfarbe & Hervorhebungen */
+  /* Main color & highlights */
   --cocreate-main-color: var(--secondary-main-color);
   --cocreate-highlight-color: yellow;
   --cocreate-admin-color: gold;
 
-  /* Radius & Abstände */
+  /* Radius & spacing */
   --cocreate-radius-large: 1.25rem;
   --cocreate-radius-small: 0.625rem;
   --cocreate-padding: 0.625rem;
   --cocreate-margin: 0.625rem;
 
-  /* Schriftgrößen */
+  /* Font sizes */
   --cocreate-font-size-base: 1rem;
   --cocreate-font-size-small: 0.875rem;
   --cocreate-font-size-large: 1.25rem;
@@ -26,7 +26,7 @@
 
 
 /* ===========================
-   TYPOGRAFIE
+   TYPOGRAPHY
    =========================== */
 h2 {
   color: var(--cocreate-main-color);
@@ -34,16 +34,15 @@ h2 {
 
 
 /* ===========================
-   DIALOGFENSTER
+   DIALOG WINDOW
    =========================== */
 dialog {
   position: fixed;
   margin: 0;
   top: 10vh;
   left: 1vw;
-  background: rgb(226, 253, 253); /* eigene Farbe */
+  background: rgb(226, 253, 253); /* custom color */
 }
-
 
 /* ===========================
    BUTTONS
@@ -57,7 +56,7 @@ button {
 
 
 /* ===========================
-   SEITENLEISTE LINKS
+   LEFT SIDEBAR
    =========================== */
 #sidebar-left {
   margin-right: var(--cocreate-margin);
@@ -73,7 +72,7 @@ button {
   font-size: var(--cocreate-font-size-small);
 }
 
-/* Bild innerhalb der Sidebar */
+/* Image inside sidebar */
 .sidebar img {
     height: 4.6875rem;
     width: 4.6875rem;
@@ -83,7 +82,7 @@ button {
 
 
 /* ===========================
-   TOOLBAR MIT DRAG-ITEMS
+   TOOLBAR WITH DRAG ITEMS
    =========================== */
 #toolbar {
   position: fixed;
@@ -99,7 +98,7 @@ button {
 
 
 /* ===========================
-   NODE-VORLAGEN (drag-drop)
+   NODE TEMPLATES (drag-drop)
    =========================== */
 .node-template {
   width: 17vh;
@@ -113,7 +112,7 @@ button {
   text-align: center;
   font-size: var(--cocreate-font-size-large);
 
-  /* Farbliche Unterscheidung nach Typ */
+  /* Visual differentiation by type */
   &[data-type="1"] { background: var(--color-level-1); }
   &[data-type="2"] { background: var(--color-level-2); }
   &[data-type="3"] { background: var(--color-level-3); }
@@ -121,7 +120,7 @@ button {
 
 
 /* ===========================
-   MINDMAP-BEREICH
+   MINDMAP AREA
    =========================== */
 #mindmap-container {
   display: flex;
@@ -139,7 +138,7 @@ button {
 
 
 /* ===========================
-   SVG-ZEICHENFLÄCHE
+   SVG CANVAS
    =========================== */
 svg {
   border: 0.0625rem solid #ccc;
@@ -150,7 +149,7 @@ svg {
 
 
 /* ===========================
-   DRAGGABLE SVG-ELEMENTE
+   DRAGGABLE SVG ELEMENTS
    =========================== */
 .draggable ellipse,
 .draggable rect {
@@ -158,12 +157,12 @@ svg {
   transition: stroke 0.2s ease;
   overflow: hidden;
 
-  /* Dragging-Zustand */
+  /* Dragging state */
   &.dragging {
     cursor: grabbing;
   }
 
-  /* Hervorhebung bei Auswahl */
+  /* Highlight on selection */
   &.highlighted {
     stroke: var(--cocreate-highlight-color);
     stroke-width: 0.1875rem;
@@ -173,7 +172,7 @@ svg {
 
 
 /* ===========================
-   VERBINDUNGSLINIEN
+   CONNECTION LINES
    =========================== */
 .connection-line.highlighted {
   stroke: var(--cocreate-highlight-color);
@@ -183,7 +182,7 @@ svg {
 
 
 /* ===========================
-   INLINE-TEXTFELDER
+   INLINE TEXT INPUTS
    =========================== */
 foreignObject input {
   width: 100%;
@@ -202,7 +201,7 @@ foreignObject input {
 
 
 /* ===========================
-   ADMIN-BADGE
+   ADMIN BADGE
    =========================== */
 .badge.admin {
   background-color: var(--cocreate-admin-color);
@@ -216,7 +215,7 @@ foreignObject input {
 
 
 /* ===========================
-   MODALE OVERLAYS
+   MODAL OVERLAYS
    =========================== */
 #ipLockOverlay {
   display: none;
@@ -233,12 +232,12 @@ foreignObject input {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* halbtransparentes Schwarz */
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
   z-index: 9999;
   align-items: center;
   justify-content: center;
 
-  /* Box-Inhalte innerhalb von Modals */
+ /* Box contents inside modals */
   .overlay-box,
   .modal-content {
     background: white;

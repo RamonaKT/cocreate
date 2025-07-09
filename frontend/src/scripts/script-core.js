@@ -700,10 +700,11 @@ export async function exportMindmapToPDF() {
         yOffset: 0,
         scale: 1
     });
-    const safeTitle = mindmapTitle.replace(/[^\w\-]+/g, "_"); // ersetzt unsichere Zeichen
+    const safeTitle = mindmapTitle.replace(/[^\w\-]+/g, "_"); // replaces insecure Chars
     pdf.save(`mindmap_${safeTitle}.pdf`);
 }
 
+// Exposes the exportMindmapToPDF function globally, 
 window.exportMindmapToPDF = exportMindmapToPDF;
 //start of ipaddress locking
 // Handles nickname submission, IP validation, admin check, and user registration.
@@ -871,7 +872,7 @@ window.addEventListener('load', async () => {
 async function loadUsersForCurrentMindmap(shadowRoot = document) {
     const mindmapId = new URLSearchParams(window.location.search).get('id');
     const container = shadowRoot.getElementById('userListContainer');
-    container.innerHTML = ''; // vorher leeren
+    container.innerHTML = ''; // clear beforehand
     if (!mindmapId) {
         container.textContent = "No valid Mindmap-ID.";
         return;
@@ -932,6 +933,8 @@ async function lockUserByNickname(nickname) {
     console.log(`User "${nickname}" blocked until ${lockUntil}.`);
 }
 
+// Exposes the loadUsersForCurrentMindmap function globally, 
+// so it can be called from outside the module (e.g., from the browser console or inline scripts)
 window.loadUsersForCurrentMindmap = loadUsersForCurrentMindmap;
 
 // SOCKET IO: -------
@@ -1134,7 +1137,7 @@ async function loadMindmapFromDB(id) {
             scheduleSVGSave();
         }
     });
-    // Titel-Element aktualisieren (außerhalb Shadow DOM)
+    // update title item (outside Shadow DOM)
     const titleEl = document.getElementById('mindmapTitle');
     if (titleEl && data.title) {
         titleEl.textContent = data.title;

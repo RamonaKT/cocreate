@@ -1,65 +1,39 @@
-
 :root {
-  /* Basis-Farben für verschiedene Interface-Elemente */
+  /* Base colors for various interface elements */
   --secondary-main-color: #797ec6;
-  --color-level-1: #797ec6;
-  --color-level-2: #a4a9ea; 
-  --color-level-3: #ced2ff; 
 }
 
 /* ===========================
-   NODE-VORLAGEN (drag-drop) // falls es hier gezogen wird und nicht im anderen style
-   =========================== */
-/* Wird z. T. aus dieser Vorlage per Drag & Drop in die Arbeitsfläche gezogen */
-.node-template {
-  width: 17vh;
-  height: 5vh;
-  border-radius: var(--cocreate-radius-large); /* nutzt zentrale Variable */
-  border: 0.125rem solid black;
-  color: black;
-  line-height: 2.5rem;
-  cursor: grab; /* zeigt, dass Element ziehbar ist */
-  user-select: none; /* verhindert Textauswahl */
-  text-align: center;
-  font-size: var(--cocreate-font-size-large);
-
-  /* Farbvarianten abhängig vom Datentyp */
-  &[data-type="1"] { background: var(--color-level-1); }
-  &[data-type="2"] { background: var(--color-level-2); }
-  &[data-type="3"] { background: var(--color-level-3); }
-}
-
-/* ===========================
-   GRUNDLAGEN FÜR DAS DOKUMENT
+   BASE STYLES FOR THE DOCUMENT
    =========================== */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f0f0f0; /* Fallback-Hintergrund */
+  background: #f0f0f0; /* fallback background */
   text-align: center;
-  background: linear-gradient(to right, #9e78e9, #9eedf0); /* weicher Verlauf */
-  font-size: 16px; /* Basis-Schriftgröße für rem-Einheiten */
+  background: linear-gradient(to right, #9e78e9, #9eedf0); /* smooth gradient */
+  font-size: 16px; /* base font size for rem units */
 }
 
 /* ===========================
-   HEADER / NAVIGATIONSBEREICH
+   HEADER / NAVIGATION AREA
    =========================== */
 .header {
   display: flex;
   align-items: center;
-  column-gap: 1rem; /* Abstand zwischen Elementen */
+  column-gap: 1rem; /* spacing between elements */
   height: 5vh;
   overflow: hidden;
-  background-color: white; /* Standard-Hintergrund */
+  background-color: white; /* default background */
 }
 
 .logo {
   height: 100%;
-  width: auto; /* Logo passt sich proportional an */
+  width: auto; /* logo scales proportionally */
 }
 
 /* ===========================
-   HAUPTÜBERSCHRIFT
+   MAIN HEADING
    =========================== */
 h1 {
   font-size: 4vh;
@@ -71,10 +45,10 @@ h1 {
 }
 
 /* ===========================
-   MODAL DIALOGFENSTER
+   MODAL DIALOG WINDOW
    =========================== */
 dialog {
-  background-color: #caeff0; /* weiches Türkis */
+  background-color: #caeff0; /* soft turquoise */
   position: fixed;
   margin: 0;
   top: 10vh;
@@ -82,7 +56,7 @@ dialog {
 }
 
 /* ===========================
-   ZWISCHENÜBERSCHRIFT
+   SUBHEADINGS
    =========================== */
 h2 {
   margin-top: 0;
@@ -91,10 +65,10 @@ h2 {
 }
 
 /* ===========================
-   STANDARD-BUTTONS
+   STANDARD BUTTONS
    =========================== */
 button {
   border-radius: 20px;
   margin-top: 10px;
-  background-color: #797ec6; /* Hauptfarbe (statt Variable) */
+  background-color: #797ec6; /* main color (instead of variable) */
 }
