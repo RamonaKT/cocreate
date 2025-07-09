@@ -54,6 +54,6 @@ Ein webbasiertes kollaboratives Mindmap-Tool, das es mehreren Nutzern ermöglich
 5.	http://localhost:1235 im Browser öffnen
 
 ## Zugang über Browser (falls möglich):
-1.	Mit Cisco Secure Client mit dem Hochschul-Server verbinden
+1.	Mit Cisco Secure Client mit dem Hochschul-Server der DHBW Mannheim verbinden
 2.	http://141.72.13.151:8202 im Browser öffnen
 
