@@ -45,8 +45,9 @@ let viewBox = {
     w: initialViewBoxSize,
     h: initialViewBoxSize,
 };
-let mindmapTitle = "mindmap"; // Defaultwert
+let mindmapTitle = "mindmap"; // Default
 
+// Schedules saving the current SVG to the database after a delay (default: 1 second).
 function scheduleSVGSave(delay = 1000) {
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
@@ -54,6 +55,7 @@ function scheduleSVGSave(delay = 1000) {
     }, delay);
 }
 
+// Saves the current SVG content to the Supabase database for the active mindmap.
 async function saveSVGToSupabase() {
     if (!mindmapId) {
         return;
@@ -65,14 +67,14 @@ async function saveSVGToSupabase() {
         .update({ svg_code: svgData })
         .eq('creationid', mindmapId);
     if (error) {
-        console.error('Fehler beim Speichern des SVGs:', error.message);
-        // Optional: Fehler weiter werfen oder anderweitig behandeln
-        throw new Error('Speichern des SVGs in Supabase fehlgeschlagen: ' + error.message);
+        console.error('Error saving SVG:', error.message);
+        throw new Error('Failed to save SVG in Supabase: ' + error.message);
     }
     console.log("added to supabase :)))")
-    return data; // Optional: Rückgabe der aktualisierten Daten
+    return data; 
 }
 
+// Updates all connection lines related to a moved node.
 function updateConnections(movedId) {
     allConnections.forEach(conn => {
         if (conn.fromId === movedId || conn.toId === movedId) {
@@ -86,6 +88,7 @@ function updateConnections(movedId) {
     });
 }
 
+// Visually and logically connects two nodes with a line, and emits events over the socket if applicable.
 function connectNodes(fromId, toId, fromNetwork = false) {
     const from = allNodes.find(n => n.id === fromId);
     const to = allNodes.find(n => n.id === toId);
@@ -134,7 +137,7 @@ function connectNodes(fromId, toId, fromNetwork = false) {
     }
 }
 
-
+// Adds or removes highlight styling from a node by its ID.
 export function highlightNode(id, on) {
     const node = allNodes.find(n => n.id === id);
     if (!node) return;
@@ -144,10 +147,10 @@ export function highlightNode(id, on) {
     else shape.classList.remove('highlighted');
 }
 
-
+// Creates and displays a modal asking the user to enter a nickname.
 export function createNicknameModal(shadowRoot = document) {
     if (!shadowRoot || shadowRoot === document) {
-        console.warn('❗ Achtung: createNicknameModal wurde ohne ShadowRoot aufgerufen!');
+        console.warn('Attention: createNicknameModal was called without ShadowRoot!');
         return;
     }
     if (shadowRoot.getElementById('nicknameModal')) return;
@@ -155,9 +158,9 @@ export function createNicknameModal(shadowRoot = document) {
     modal.id = 'nicknameModal';
     modal.innerHTML = `
     <div class="modal-content">
-      <h2>Nickname wählen</h2>
-      <input id="nicknameInput" type="text" placeholder="Dein Nickname" />
-      <button id="nicknameSubmitButton">Speichern</button>
+      <h2>Choose nickname</h2>
+      <input id="nicknameInput" type="text" placeholder="Your Nickname" />
+      <button id="nicknameSubmitButton">Save</button>
     </div>
   `;
     shadowRoot.appendChild(modal);
@@ -172,12 +175,13 @@ export function createNicknameModal(shadowRoot = document) {
     });
 }
 
+// Adds pointer, click, and rename events to an SVG node group.
 function addEventListenersToNode(group, id, r) {
     const node = allNodes.find(n => n.id === id);
     if (!node) return;
     const shape = group.querySelector('ellipse, rect');
     const text = group.querySelector('text');
-    // Drag Start
+    // Drag start
     group.addEventListener('pointerdown', e => {
         const isInputClick = e.target.tagName === 'INPUT' || e.target.closest('foreignObject');
         if (isInputClick) return;
@@ -188,7 +192,7 @@ function addEventListenersToNode(group, id, r) {
         offset.y = point.y - node.y;
         shape.classList.add('dragging');
     });
-    // Drag-Ende auf SVG (mouseup)
+    // Drag end on SVG (mouseup)
     svg.addEventListener('pointerup', (e) => {
         if (dragTarget) {
             const id = dragTarget.dataset.nodeId;
@@ -215,7 +219,7 @@ function addEventListenersToNode(group, id, r) {
         }
         dragTarget = null;
     });
-    // Click-Verbindung
+    // Click-connection
     group.addEventListener('click', e => {
         e.stopPropagation();
         if (selectedConnection) {
@@ -234,7 +238,7 @@ function addEventListenersToNode(group, id, r) {
             selectedNode = null;
         }
     });
-    // Doppelklick zum Umbenennen
+    // Double click to rename
     text?.addEventListener('dblclick', e => {
         e.stopPropagation();
         if (group.querySelector('foreignObject')) return;
@@ -261,7 +265,7 @@ function addEventListenersToNode(group, id, r) {
             if (socket) {
                 socket.emit("node-renamed", { id, text: value });
                 try {
-                    await saveSVGToSupabase(); // <- hier wird gewartet
+                    await saveSVGToSupabase(); // <- waiting here
                 } catch (e) {
                     console.error("Fehler beim Speichern:", e);
                 }
@@ -279,6 +283,7 @@ function addEventListenersToNode(group, id, r) {
     });
 }
 
+// Creates a new node at a given position with a specific type and adds it to the SVG.
 function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
     const style = nodeStyles[type];
  if (!style) {
@@ -303,7 +308,7 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
         shape.setAttribute("rx", style.r);
         shape.setAttribute("ry", style.r * 0.6);
     } else if (type === "2") {
-        // Rechteck mit abgerundeten Ecken
+        // rounded edges
         shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         shape.setAttribute("x", -style.r);
         shape.setAttribute("y", -style.r * 0.6);
@@ -312,7 +317,7 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
         shape.setAttribute("rx", 15);
         shape.setAttribute("ry", 15);
     } else {
-        // Rechteck mit scharfen Ecken (Ebene 3)
+        // rectangle
         shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         shape.setAttribute("x", -style.r);
         shape.setAttribute("y", -style.r * 0.6);
@@ -342,17 +347,18 @@ function createDraggableNode(x, y, type, idOverride, fromNetwork = false) {
     }
 }
 
+// Handles user access to the mindmap based on their IP and nickname, including admin detection.
 async function initializeAccessControl(shadowRoot) {
     const mindmapId = new URLSearchParams(window.location.search).get('id');
     if (!mindmapId) return;
-    createNicknameModal(shadowRoot); // Modal vorbereiten
+    createNicknameModal(shadowRoot); // prepare Modal
     let ip = 'unknown';
     try {
         const res = await fetch('https://api.ipify.org?format=json');
         const data = await res.json();
         ip = data.ip;
     } catch (err) {
-        console.warn("IP konnte nicht ermittelt werden:", err);
+        console.warn("Couldn't load IP", err);
         showNicknameModal(shadowRoot);
         return;
     }
@@ -368,15 +374,15 @@ async function initializeAccessControl(shadowRoot) {
                 .maybeSingle();
             if (!error && user && !user.locked && user.mindmap_id === mindmapId) {
                 userNickname = storedNickname;
-                console.log("Automatisch eingeloggt:", userNickname);
+                console.log("automatic log-in:", userNickname);
                 shadowRoot.getElementById('nicknameModal')?.remove();
                 return;
             }
         } catch (e) {
-            console.error("Fehler bei Login mit gespeicherten Nickname:", e);
+            console.error("Error logging in with saved nickname", e);
         }
     }
-    // Fallback: Suche Benutzer mit passender IP und Mindmap
+    // Fallback: search for user with matching ip and mindmap
     try {
         const { data: user, error } = await supabase
             .from('users')
@@ -398,8 +404,9 @@ async function initializeAccessControl(shadowRoot) {
     showNicknameModal(shadowRoot);
 }
 
+// Displays the nickname input modal to the user.
 export function showNicknameModal(shadowRoot = document) {
-    // Modal einfügen oder anzeigen
+    // create/attach or show Modal
     let modal = shadowRoot.getElementById('nicknameModal');
     if (!modal) {
         createNicknameModal(shadowRoot);
@@ -408,11 +415,13 @@ export function showNicknameModal(shadowRoot = document) {
     if (modal) {
         modal.style.display = 'flex';
     } else {
-        console.error("⚠️ Konnte Modal nicht anzeigen – fehlt.");
+        console.error("Couldn't show modal - missing");
     }
     sessionStorage.removeItem("mindmap_nickname");
     localStorage.removeItem("mindmap_nickname");
 }
+
+// Periodically checks if the user's IP is currently locked from editing the mindmap.
 function startIpLockWatcher(ip, mindmapId, shadowRoot) {
     async function checkLock() {
         try {
@@ -422,7 +431,7 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
                 .eq('ipadress', await hashIp(ip))
                 .eq('mindmap_id', mindmapId);
             if (error) {
-                console.error("Fehler bei Lock-Check:", error.message);
+                console.error("Error at Lock-Check:", error.message);
             } else {
                 const now = new Date();
                 for (const user of users) {
@@ -434,9 +443,9 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
                                 .update({ locked: false, locked_until: null })
                                 .eq('nickname', user.nickname)
                                 .eq('mindmap_id', mindmapId);
-                            console.log(`🔓 Nutzer ${user.nickname} automatisch entsperrt.`);
+                            console.log(`User ${user.nickname} automatically unblocked.`);
                         } else {
-                            console.warn(`🚫 Nutzer ${user.nickname} ist noch gesperrt.`);
+                            console.warn(`User ${user.nickname} is still blocked.`);
                             showNicknameModal(shadowRoot);
                             return;
                         }
@@ -444,9 +453,9 @@ function startIpLockWatcher(ip, mindmapId, shadowRoot) {
                 }
             }
         } catch (err) {
-            console.error("Fehler bei Lock-Überprüfung:", err);
+            console.error("Error at Lock-Verification:", err);
         }
-        setTimeout(checkLock, 5000); // regelmäßig prüfen
+        setTimeout(checkLock, 5000); // periodical check up
     }
     checkLock();
 }
@@ -467,7 +476,7 @@ if (mindmapId) {
         });
     });
     socket.on("node-moving", data => {
-        console.log("📡 node-moving empfangen", data);
+        console.log("node-moving received", data);
         const node = allNodes.find(n => n.id === data.id);
         if (node) {
             node.x = data.x;
@@ -499,7 +508,7 @@ if (mindmapId) {
             svg.removeChild(node.group);
         }
         allNodes.splice(nodeIndex, 1);
-        // Verbindungen entfernen
+        // Delete Connections
         allConnections = allConnections.filter(conn => {
             if (conn.fromId === id || conn.toId === id) {
                 if (svg.contains(conn.line)) {
@@ -511,7 +520,7 @@ if (mindmapId) {
         });
     });
     socket.on("connection-added", ({ fromId, toId }) => {
-        // Duplikate verhindern
+        // Prevent Duplicates
         if (allConnections.some(conn => conn.fromId === fromId && conn.toId === toId)) return;
         connectNodes(fromId, toId);
     });
@@ -537,21 +546,22 @@ if (mindmapId) {
         window.location.href = "/";
     });
     socket.on("user-joined", ({ userId, isAdmin }) => {
-        // aktualisiere UI
+        // update UI
     });
     socket.on("user-kicked", ({ userId }) => {
-        // entferne aus UI
+        // remove from UI
     });
     socket.on("user-left", ({ userId }) => {
-        // entferne aus UI
+        // remove from UI
     });
 }
 
+// Generates a unique UUID using crypto.randomUUID() or a fallback pattern.
 function createUUID() {
     if (window.crypto?.randomUUID) {
         return window.crypto.randomUUID();
     }
-    // Fallback: einfache, sichere UUID-Alternative
+    // Fallback: simple and secure alternative UUID
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
         const r = Math.random() * 16 | 0;
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -565,6 +575,7 @@ function getSVGSource() {
     return serializer.serializeToString(svg);
 }
 
+// Prompts the user for a title and saves the current mindmap SVG to Supabase.
 export async function saveCurrentMindmap() {
     const title = prompt("Titel eingeben:");
     if (!title) return;
@@ -572,30 +583,30 @@ export async function saveCurrentMindmap() {
     const ip = await fetch('https://api.ipify.org').then(res => res.text());
     try {
         const result = await saveCreation(svgData, title, ip);
-        // Nehme die ID der gespeicherten Zeile aus Supabase
+        // Take the ID of the saved row from Supabase
         const id = result[0]?.creationid;
         if (id) {
-            alert("Erfolgreich gespeichert! Du wirst weitergeleitet...");
+            alert("Successfully saved! You will be redirected...");
             const link = `${location.origin}/?id=${id}`;
             window.location.href = link;
             console.log(link);
         } else {
-            alert("Gespeichert, aber keine ID zurückbekommen.");
+            alert("Saved, but no ID returned.");
         }
     } catch (error) {
-        console.error("Fehler beim Speichern:", error);
-        alert("Fehler beim Speichern!");
+        console.error("Error at Saving:", error);
+        alert("Error at Saving!");
     }
 }
 
-// Drag aus Toolbar
+// Drag from Toolbar
 document.querySelectorAll('.node-template').forEach(el => {
     el.addEventListener('dragstart', e => {
         draggedType = e.target.getAttribute('data-type');
     });
 });
 
-// Browser-Koordinaten -> SVG-Koordinaten
+// Converts screen (client) coordinates to SVG coordinates.
 function getSVGPoint(x, y) {
     const pt = svg.createSVGPoint();
     pt.x = x;
@@ -603,6 +614,7 @@ function getSVGPoint(x, y) {
     return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
+// Exports the mindmap as a PDF file using jsPDF and svg2pdf.js.
 export async function exportMindmapToPDF() {
     const pdf = new jsPDF({
         orientation: 'landscape',
@@ -620,15 +632,16 @@ export async function exportMindmapToPDF() {
 
 window.exportMindmapToPDF = exportMindmapToPDF;
 //start of ipaddress locking
+// Handles nickname submission, IP validation, admin check, and user registration.
 window.submitNickname = async function (shadowRoot = document) {
     const input = shadowRoot.getElementById('nicknameInput')?.value.trim();
     if (!input) {
-        alert("Bitte Nickname eingeben.");
+        alert("Please enter nickname.");
         return;
     }
     const mindmapId = new URLSearchParams(window.location.search).get('id');
     if (!mindmapId) {
-        alert("Keine gültige Mindmap-ID in der URL.");
+        alert("No valid mindmap ID in the URL.");
         return;
     }
     let ip = 'unknown';
@@ -637,7 +650,7 @@ window.submitNickname = async function (shadowRoot = document) {
         const data = await res.json();
         ip = data.ip;
     } catch (err) {
-        console.warn("IP konnte nicht ermittelt werden:", err);
+        console.warn("IP could not be determined:", err);
     }
     const { data: existingLocks, error: lockError } = await supabase
         .from('users')
@@ -645,7 +658,7 @@ window.submitNickname = async function (shadowRoot = document) {
         .eq('ipadress', await hashIp(ip))
         .eq('mindmap_id', mindmapId);
     if (lockError) {
-        alert("Fehler beim Sperr-Check.");
+        alert("Error during lock check.");
         return;
     }
     const now = new Date();
@@ -653,11 +666,11 @@ window.submitNickname = async function (shadowRoot = document) {
         user.locked && (!user.locked_until || new Date(user.locked_until) > now)
     );
     if (anyLocked) {
-        alert("Du bist für diese Mindmap aktuell gesperrt.");
+        alert("You are currently locked for this mind map.");
         return;
     }
     try {
-        // versuch dass pro Mindmap nur jeder nickname einmal, aber sonst häufiger
+        // try to have only one nickname per mindmap, but otherwise more often
         const { data: existingUser, error } = await supabase
             .from('users')
             .select('*')
@@ -665,29 +678,29 @@ window.submitNickname = async function (shadowRoot = document) {
             .eq('mindmap_id', mindmapId)
             .maybeSingle();
         if (error) {
-            alert("Fehler beim Überprüfen des Nicknames.");
+            alert("Error checking the nickname.");
             return;
         }
         if (existingUser) {
             if (existingUser.locked) {
-                alert("Dieser Nickname ist aktuell gesperrt.");
+                alert("This nickname is currently blocked.");
                 return;
             }
-            alert("Dieser Nickname ist für diese Mindmap bereits vergeben.");
+            alert("This nickname is already taken for this mind map.");
             return;
         }
-        // Hol dir admin_ip für diese Mindmap
+        // get admin_ip for this mindmap
         const { data: creationData, error: creationError } = await supabase
             .from('creations')
             .select('admin_ip')
             .eq('creationid', mindmapId)
             .single();
         if (creationError || !creationData) {
-            alert("Mindmap-Info konnte nicht geladen werden.");
+            alert("Mindmap info could not be loaded.");
             return;
         }
         const isAdmin = creationData.admin_ip === ip;
-        // versuch dass pro Mindmap nur jeder nickname einmal, aber sonst häufiger
+        //  try to have only one nickname per mindmap, but otherwise more often
         const { error: insertError } = await supabase
             .from('users')
             .insert([{
@@ -697,20 +710,20 @@ window.submitNickname = async function (shadowRoot = document) {
                 admin: isAdmin,
                 mindmap_id: parseInt(mindmapId)
             }]);
-        if (isAdmin) console.log("Adminrechte zugewiesen");
+        if (isAdmin) console.log("Admin rights assigned");
         if (insertError) {
-            alert("Fehler beim Speichern: " + insertError.message);
+            alert("Error Saving: " + insertError.message);
             return;
         }
-        // Nutzer erfolgreich gespeichert
+        // User saved successfully
         userNickname = input;
         localStorage.setItem("mindmap_nickname", userNickname);
         shadowRoot.getElementById('nicknameModal')?.remove();
         startIpLockWatcher(ip);
-        console.log("Neuer Nutzer gespeichert & Zugriff erlaubt:", userNickname);
+        console.log("New user saved & access allowed:", userNickname);
     } catch (err) {
-        console.error("Fehler bei Nickname-Speicherung:", err);
-        alert("Fehler beim Speichern.");
+        console.error("Error with nickname saving", err);
+        alert("Error at Saving.");
     }
 };
 
@@ -720,7 +733,7 @@ window.addEventListener('load', async () => {
 
     const host = document.querySelector('cocreate-mindmap');
     if (!host || !host.shadowRoot) {
-        console.error("❌ ShadowRoot nicht gefunden!");
+        console.error("ShadowRoot not found!");
         return;
     }
     const shadowRoot = host.shadowRoot;
@@ -731,13 +744,13 @@ window.addEventListener('load', async () => {
         const data = await res.json();
         ip = data.ip;
     } catch (err) {
-        console.warn("IP konnte nicht ermittelt werden:", err);
+        console.warn("IP could not be determinedn:", err);
         showNicknameModal(shadowRoot);
         return;
     }
-    // Sofort Sperre prüfen
+    // check instant block
     startIpLockWatcher(ip);
-    // Zuerst: nickname aus localStorage versuchen
+    // first: try nickname from localstorage
     const storedNickname = localStorage.getItem("mindmap_nickname");
     if (storedNickname) {
         try {
@@ -749,7 +762,7 @@ window.addEventListener('load', async () => {
                 .maybeSingle();
             if (!error && user && !user.locked && user.mindmap_id == mindmapId) {
                 userNickname = storedNickname;
-                console.log("Automatisch eingeloggt:", userNickname);
+                console.log("automatac log-in:", userNickname);
                 document.getElementById('nicknameModal')?.remove();
                 startIpLockWatcher(ip);
                 return;
@@ -758,7 +771,7 @@ window.addEventListener('load', async () => {
             console.error("Fehler bei Login mit gespeicherten Nickname:", e);
         }
     }
-    // Wenn nicht: per IP nach gültigem Nutzer suchen
+    // otherwise: search user per IP 
     try {
         const { data: user, error } = await supabase
             .from('users')
@@ -769,16 +782,18 @@ window.addEventListener('load', async () => {
         if (!error && user && !user.locked) {
             userNickname = user.nickname;
             localStorage.setItem("mindmap_nickname", userNickname);
-            console.log("Automatisch über IP eingeloggt:", userNickname);
+            console.log("Automatically logged in via IP:", userNickname);
             document.getElementById('nicknameModal')?.remove();
             startIpLockWatcher(ip);
             return;
         }
     } catch (err) {
-        console.error("Fehler bei Login über IP:", err);
+        console.error("Error Logging in per IP:", err);
     }
     showNicknameModal(shadowRoot);
 });
+
+// Loads and displays a list of users currently associated with the mindmap.
 async function loadUsersForCurrentMindmap(shadowRoot = document) {
     const mindmapId = new URLSearchParams(window.location.search).get('id');
     const container = shadowRoot.getElementById('userListContainer');
