@@ -274,23 +274,29 @@ foreignObject input {
     --cocreate-font-size-large: 1rem;
   }
 
+  
   #sidebar-left {
-    position: fixed;
-    width: 80vw;
-    max-width: none;
-    left: 0;
-    top: 0;
-    height: 100vh;
+    margin-right: var(--cocreate-margin);
+    max-width: 4.6875rem;
     background-color: transparent;
-    z-index: 1000;
-    font-size: var(--cocreate-font-size-base);
+    position: absolute;
+    left: 1vw;
+    top: 10vh;
+    width: 15rem;
+    height: 5rem;
+    padding: var(--cocreate-padding);
+    text-align: left;
+    overflow-y: auto;
+    font-size: var(--cocreate-font-size-small);
   }
 
-.sidebar img {
-    height: 3rem;
-    width: 3rem;
-    cursor: pointer;
- }
+
+  .sidebar img {
+      height: 3rem;
+      width: 3rem;
+      border-radius: 15%;
+      cursor: pointer;
+  }
 
 
   #toolbar {
