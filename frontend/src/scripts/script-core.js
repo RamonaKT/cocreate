@@ -4,6 +4,8 @@ import { jsPDF } from 'jspdf';
 import { svg2pdf } from 'svg2pdf.js';
 import { hashIp } from './hash';
 
+import { applyTextToNode } from './applyTextToNode.js';
+
 import {
     initSocket,
     emitNodeMoving,
@@ -456,13 +458,13 @@ function addEventListenersToNode(group, id, r) {
         input.focus();
         const save = async () => {
 
-            const value = input.value.trim();
-            const safeValue = value || "...";
-            text.textContent = safeValue;
+          const rawText = input.value.trim();
+            applyTextToNode(text, rawText);
+          
             if (group.contains(fo)) {
                 group.removeChild(fo);
             }
-            emitNodeRenamed({ id, text: safeValue });
+            emitNodeRenamed({ id, text: rawText });
 
             try {
                 await saveSVGToSupabase();
@@ -1005,10 +1007,13 @@ if (mindmapId) {
         },
         onNodeRenamed: ({ id, text }) => {
             const node = allNodes.find(n => n.id === id);
-            if (node) {
+           if (node) {
                 const textEl = node.group.querySelector("text");
-                if (textEl) textEl.textContent = text;
+                if (textEl) {
+                    applyTextToNode(textEl, text); 
+                }
             }
+
         },
     });
 }
