@@ -56,4 +56,7 @@ Ein webbasiertes kollaboratives Mindmap-Tool, das es mehreren Nutzern ermöglich
 ## Zugang über Browser (falls möglich):
 1.	Mit Cisco Secure Client mit dem Hochschul-Server der DHBW Mannheim verbinden
 2.	http://141.72.13.151:8202 im Browser öffnen
+    ODER
+    In die eigene Website einbauen mit:
+    <iframe id="mindmapFrame" src="http://141.72.13.151:8202" style="border: 3px; width: 100%; height: 600px;"></iframe> 
 
