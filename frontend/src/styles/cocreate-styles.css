@@ -283,7 +283,6 @@ foreignObject input {
     left: 1vw;
     top: 10vh;
     width: 15rem;
-    height: 5rem;
     padding: var(--cocreate-padding);
     text-align: left;
     overflow-y: auto;
@@ -304,8 +303,8 @@ foreignObject input {
     height: auto;
     gap: 1rem;
     top: auto;
-    bottom: 1rem;
-    right: 1rem;
+    top: 10vh;
+    right: 1vw;
   }
 
   #mindmap-container {
