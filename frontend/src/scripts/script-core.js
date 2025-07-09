@@ -142,6 +142,7 @@ export function highlightNode(id, on) {
     if (!shape) return;
     if (on) shape.classList.add('highlighted');
     else shape.classList.remove('highlighted');
+}
 
 
 export function createNicknameModal(shadowRoot = document) {
