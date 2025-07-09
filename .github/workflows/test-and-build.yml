@@ -26,8 +26,8 @@ jobs:
       #   continue-on-error: true
 
       # Optional (when tests are done)
-      # - name: Run tests
-      #   run: npm test
+      - name: Run tests
+        run: npm test
 
       - name: Build the app
         run: npm run build
